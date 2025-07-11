@@ -11,7 +11,7 @@ exports.addToCart=async(req,res)=>{
             });
         }
 
-        const user=await User.findById(req.payload.id).populate('cart.product');
+        const user=await User.findOne({firebaseUid:req.payload.uid}).populate('cart.product');
 
         
         if(!user){
@@ -58,7 +58,7 @@ exports.deleteFromCart=async(req,res)=>{
             });
         }
 
-        const user=await User.findById(req.payload.id).populate('cart.product');
+        const user=await User.finedOne({firebaseUid:req.payload.uid}).populate('cart.product');
         if(!user){
             return res.status(404).json({
                 success:false,
@@ -93,7 +93,7 @@ exports.deleteFromCart=async(req,res)=>{
 
 exports.getCartItems=async(req,res)=>{
     try{
-        const user=await User.findById(req.payload.id).populate('cart.product');
+        const user=await User.findOne({firebaseUid:req.payload.uid}).populate('cart.product');
 
         if(!user){
             return res.status(404).json({

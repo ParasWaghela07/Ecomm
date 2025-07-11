@@ -4,9 +4,9 @@ const Order = require('../models/Order');
 exports.createOrder = async (req, res) => {
     try{
         const {address}= req.body;
-        const userid=req.payload.id;
+        const userid=req.payload.uid;
 
-        const user=await User.findById(userid).populate('cart.product');
+        const user=await User.findOne({firebaseUid:userid}).populate('cart.product');
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
@@ -44,7 +44,7 @@ exports.cancelOrder=async(req,res)=>{
             return res.status(400).json({ message: 'Order ID is required' });
         }
 
-        const user = await User.findById(userId);
+        const user = await User.findOne({firebaseUid:userid});
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -71,7 +71,7 @@ exports.getMyOrders=async(req,res)=>{
     try{
         const userId = req.payload.id;
 
-        const user = await User.findById(userId).populate('order');
+        const user = await User.findOne({firebaseUid:userId}).populate('order');
         if (!user) {
             return res.status(404).json({ success:false,message: 'User not found' });
         }

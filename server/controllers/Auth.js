@@ -49,9 +49,9 @@ exports.SendOtp=async(req,res)=>{
     }
 }
 
-exports.register=async(req,res)=>{
+exports.MatchOtp=async(req,res)=>{
     try{
-        const {username,email,password,otp}=req.body;
+        const {otp}=req.body;
         const otpData = await Otp.findOne({ email: email, otp: otp });
         if(!otpData){
             return res.status(400).json({
@@ -66,29 +66,51 @@ exports.register=async(req,res)=>{
             })
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await User.create({
-            username:username,
-            email:email,
-            password:hashedPassword
-        });
-
         await Otp.findOneAndDelete({email:email,otp:otp});
 
-        const payload={
-            id:user._id,
-            username:user.username,
-            email:user.email
-        }
-        const token=jwt.sign(payload,process.env.JWT_SECRET);
-        const options={
-            expires:new Date(Date.now()+3*24*60*60*1000),
-            httpOnly:true,
+        return res.status(200).json({
+            success:true,
+            message:"Otp verified successfully",
+        });
+
+
+    }
+    catch(e){
+        console.log(e);
+        return res.status(500).json({
+            success:false,
+            message:"Internal server error during otp generation",
+        })
+    }
+}
+
+exports.register=async(req,res)=>{
+    try{
+        const {username,email,password,firebaseUid}=req.body;
+        const exist = await User.findOne({firebaseUid});
+
+        if(exist){
+            return res.status(400).json({
+                success:false,
+                message:"User already exist with this credentials"
+            })
         }
 
-        return res.status(201).cookie("token",token,options).json({
+        
+        let hashedPassword;
+        if(password) hashedPassword = await bcrypt.hash(password, 10);
+
+        const user = await User.create({
+            firebaseUid:firebaseUid,
+            username:username || null,
+            email:email,
+            password:hashedPassword || null,
+        });
+
+        return res.status(200).json({
             success:true,
-            message:"User registered successfully"
+            message:"User registered successfully",
+            user:user
         });
 
 

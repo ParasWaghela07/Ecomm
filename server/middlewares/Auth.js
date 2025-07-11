@@ -1,41 +1,31 @@
 const jwt=require('jsonwebtoken');
 require('dotenv').config();
-const Admin=require('../models/Admin');
-const bcrypt=require('bcrypt');
+const admin = require("firebase-admin");
+const serviceAccount = require("../serviceAccountKey.json");
 
-exports.isUser=async(req,res,next)=>{
-    try{
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
-        let token=req.cookies.token;
-        
-        if(!token){
-            return res.status(401).json({
-                success:false,
-                message:'Token Missing',
-            });
-        }
+exports.isUser = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Token missing or invalid" });
+  }
+  
+  const token = authHeader.split(" ")[1];
 
-        try{
-            const payload=jwt.verify(token,process.env.JWT_SECRET);
-            req.payload=payload;
-        }
-        catch(e){
-            console.log(e);
-            return res.status(401).json({
-                success:false,
-                message:'token is invalid',
-            });
-        }
-        next();
-    }
-    catch(e){
-        return res.status(401).json({
-            success:false,
-            message:'Something went wrong, while verifying the token',
-            error:e.message,
-        });
-    }
-}
+  try {
+    const decoded = await admin.auth().verifyIdToken(token);
+    
+    req.payload = decoded;
+    console.log("Decoded payload:", decoded);
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: "Token verification failed" });
+  }
+};
+
 
 exports.isAdmin=async(req,res,next)=>{
     try{
