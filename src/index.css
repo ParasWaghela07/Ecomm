@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap');
+@import "tailwindcss";
+
+
+.poppins-medium {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 24.59px;
+  line-height: 1;
+  letter-spacing: 0;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.poppins-regular{
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  font-size: 12.3px;
+  line-height: 1;
+  letter-spacing: 0;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.seamless-vertical-scroll {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/krsna.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: repeat-y;
+  animation: scrollVertical 50s linear infinite;
+}
+
+/* Smooth scroll animation */
+@keyframes scrollVertical {
+  0% {
+    background-position: center 0;
+  }
+  100% {
+    background-position: center 100vh;
+  }
+}
