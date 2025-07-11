@@ -47,7 +47,7 @@ useEffect(() => {
         email,
         password
       );
-      console.log(userCredential.user);
+      return userCredential.user;
     } catch (error) {
       console.error("Error registering user:", error);
     }
@@ -60,7 +60,7 @@ useEffect(() => {
         email,
         password
       );
-      console.log(userCredential.user);
+      return userCredential.user;
     } catch (error) {
       console.error("Error logging in user:", error);
     }
@@ -69,7 +69,7 @@ useEffect(() => {
   async function signInWithGoogle() {
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      console.log(result.user);
+      return result.user;
     } catch (error) {
       console.error("Google Sign-In Error:", error);
     }

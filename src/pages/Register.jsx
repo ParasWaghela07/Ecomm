@@ -1,7 +1,37 @@
 import React from 'react';
 import { FcGoogle } from "react-icons/fc";
-
+import {FirebaseContext} from '../context/FirebaseContext';
+import { useContext } from 'react';
 const Register = () => {
+
+  const {signInWithGoogle} = useContext(FirebaseContext);
+  const RegisterUser = async () => {
+    try{
+      const user=await signInWithGoogle();
+      
+      const response=await fetch('http://localhost:4000/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: user.displayName || null,
+          email: user.email,
+          firebaseUid: user.uid,
+        }),
+      })
+
+      const data = await response.json();
+      if(data.success){
+        console.log("User registered successfully:", data.user);
+      } else {
+        console.error("Registration failed:", data.message);
+      }
+    }
+    catch(error) {
+      console.error("Error during registration:", error);
+    }
+  }
   return (
     <div className="relative min-h-screen overflow-hidden bg-gray-100">
       {/* Infinite scrolling background */}
@@ -60,7 +90,7 @@ const Register = () => {
           {/* Social buttons */}
           
             
-            <button className="cursor-pointer w-full flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-full hover:bg-gray-50 transition">
+            <button className="cursor-pointer w-full flex items-center justify-center gap-2 bg-white border border-gray-300 text-[#666666] py-2 px-4 rounded-full hover:bg-gray-50 transition" onClick={RegisterUser}>
               <FcGoogle className="text-xl" />
               <span>Continue with Google</span>
             </button>
