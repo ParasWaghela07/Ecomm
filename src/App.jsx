@@ -1,13 +1,13 @@
 import { useContext } from "react";
 import { Routes ,Route} from "react-router-dom";
-import Register from "./pages/Register";
+import Auth from "./pages/Auth";
 function App() {
   
   return (
-    <div> 
+    <div className=""> 
       <Routes>
         <Route path="/" element={<h1>Home Page</h1>} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/Auth" element={<Auth />} />
       </Routes>
     </div>
   );
