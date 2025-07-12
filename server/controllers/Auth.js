@@ -11,11 +11,9 @@ require('dotenv').config();
 
 exports.SendOtp=async(req,res)=>{
     try{
-        const {username,email}=req.body;
+        const {email}=req.body;
 
-        const exist = await User.findOne({
-        $or: [{ username }, { email }]
-        });
+        const exist = await User.findOne({email});
 
         if(exist){
             return res.status(400).json({
@@ -51,7 +49,7 @@ exports.SendOtp=async(req,res)=>{
 
 exports.MatchOtp=async(req,res)=>{
     try{
-        const {otp}=req.body;
+        const {email,otp}=req.body;
         const otpData = await Otp.findOne({ email: email, otp: otp });
         if(!otpData){
             return res.status(400).json({
@@ -91,7 +89,7 @@ exports.register=async(req,res)=>{
 
         if(exist){
             return res.status(400).json({
-                success:false,
+                success:true,
                 message:"User already exist with this credentials"
             })
         }

@@ -1,20 +1,30 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FcGoogle } from "react-icons/fc";
 import {FirebaseContext} from '../context/FirebaseContext';
 import { useContext } from 'react';
 import { useState } from 'react';
 import OtpInput from 'react-otp-input'
+import { useNavigate } from 'react-router-dom';
 
 const Auth = () => {
-
+  const navigate = useNavigate();
   const [state, setState] = useState('email');
   const [login,setlogin] = useState(false);
+
+  const [email, setEmail] = useState("");
   const [OTP, setOTP] = useState("");
-  
+  const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    setEmail("");
+    setOTP("");
+    setPassword("");
+  },[login])
 
 
-  const {signInWithGoogle} = useContext(FirebaseContext);
-  const RegisterUser = async () => {
+  const {signInWithGoogle,registerWithEmailAndPassword,loginWithEmailAndPassword} = useContext(FirebaseContext);
+
+  const RegisterUsingGoogle = async () => {
     try{
       const user=await signInWithGoogle();
       
@@ -33,6 +43,7 @@ const Auth = () => {
       const data = await response.json();
       if(data.success){
         console.log("User registered successfully:", data.user);
+        navigate('/');
       } else {
         console.error("Registration failed:", data.message);
       }
@@ -41,12 +52,104 @@ const Auth = () => {
       console.error("Error during registration:", error);
     }
   }
+
+  async function otpHandler() {
+    try{
+      const response = await fetch('http://localhost:4000/SendOtp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      })
+
+      const data = await response.json();
+      if(data.success){
+        console.log("OTP sent successfully");
+        setState('otp');
+      } else {
+        console.error("Failed to send OTP:", data.message);
+      }
+    }
+    catch(e){
+      console.error("Error sending OTP:", e);
+    }
+
+  }
+
+  async function otpMatchHandler() {
+    try{
+      const response = await fetch('http://localhost:4000/MatchOtp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, otp: OTP }),
+      })
+
+      const data = await response.json();
+      if(data.success){
+        console.log("OTP matched successfully");
+        setState('password');
+      } else {
+        console.error("Failed to match OTP:", data.message);
+      }
+    }
+    catch(e){
+      console.error("Error matching OTP:", e);
+    }
+  }
+
+  async function registerHandler() {
+    try{
+      const user=await registerWithEmailAndPassword(email, password);
+      const response = await fetch('http://localhost:4000/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: user.displayName || null,
+          password: password,
+          email: user.email,
+          firebaseUid: user.uid,
+         }),
+      })
+
+      const data = await response.json();
+      if(data.success){
+        console.log("User registered successfully");
+        navigate('/');
+      } else {
+        console.error("Registration failed:", data.message);
+      }
+    }
+    catch(e){
+      console.error("Error during registration:", e);
+    }
+  }
+
+  async function loginHandler() {
+    try{
+      const user = await loginWithEmailAndPassword(email, password);
+      if(user){
+        console.log("User logged in successfully");
+        navigate('/');
+      } else {
+        console.error("Login failed");
+      }
+    }
+    catch(e){
+      console.error("Error during login:", e);
+    }
+  }
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#1A2433]">
       {/* Infinite scrolling background */}
-      <div class="seamless-scroller">
-        <div class="scroll-layer"></div>
-        <div class="scroll-layer"></div>
+      <div className="seamless-scroller">
+        <div className="scroll-layer"></div>
+        <div className="scroll-layer"></div>
       </div>
 
       {!login && (
@@ -74,10 +177,12 @@ const Auth = () => {
                 id="email"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300"
                 placeholder="email@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
-            <button className="w-full bg-[#c3c3c3] text-white py-2 px-4 rounded-full hover:bg-[#b7b7b7] transition cursor-pointer" onClick={() => setState('otp') }>
+            <button className="w-full bg-[#c3c3c3] text-white py-2 px-4 rounded-full hover:bg-[#b7b7b7] transition cursor-pointer" onClick={otpHandler}>
               Send OTP
             </button>
           </div>)}
@@ -127,7 +232,7 @@ const Auth = () => {
                           />
                     <button 
                       className="w-full bg-[#c3c3c3] text-white py-2 px-4 rounded-full hover:bg-[#b7b7b7] transition cursor-pointer" 
-                      onClick={() => setState('password')}
+                      onClick={otpMatchHandler}
                     >
                       Verify OTP
                     </button>
@@ -145,10 +250,12 @@ const Auth = () => {
                 type="password"
                 id="password"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
 
-            <button className="w-full bg-[#c3c3c3] text-white py-2 px-4 rounded-full hover:bg-[#b7b7b7] transition cursor-pointer">
+            <button className="w-full bg-[#c3c3c3] text-white py-2 px-4 rounded-full hover:bg-[#b7b7b7] transition cursor-pointer" onClick={registerHandler}>
               Create Account
             </button>
           </div>)}
@@ -161,7 +268,7 @@ const Auth = () => {
           </div>
 
           {/* Social buttons */}
-            <button className="cursor-pointer w-full flex items-center justify-center gap-2 bg-white border border-gray-300 text-[#666666] py-2 px-4 rounded-full hover:bg-gray-50 transition" onClick={RegisterUser}>
+            <button className="cursor-pointer w-full flex items-center justify-center gap-2 bg-white border border-gray-300 text-[#666666] py-2 px-4 rounded-full hover:bg-gray-50 transition" onClick={RegisterUsingGoogle}>
               <FcGoogle className="text-xl" />
               <span>Continue with Google</span>
             </button>
@@ -195,6 +302,8 @@ const Auth = () => {
                 id="email"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300"
                 placeholder="email@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
@@ -206,10 +315,12 @@ const Auth = () => {
                 type="password"
                 id="password"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
 
-            <button className="w-full bg-[#c3c3c3] text-white py-2 px-4 rounded-full hover:bg-[#b7b7b7] transition cursor-pointer">
+            <button className="w-full bg-[#c3c3c3] text-white py-2 px-4 rounded-full hover:bg-[#b7b7b7] transition cursor-pointer" onClick={loginHandler}>
               Log in
             </button>
           </div>
@@ -224,7 +335,7 @@ const Auth = () => {
           {/* Social buttons */}
           
             
-            <button className="cursor-pointer w-full flex items-center justify-center gap-2 bg-white border border-gray-300 text-[#666666] py-2 px-4 rounded-full hover:bg-gray-50 transition" onClick={RegisterUser}>
+            <button className="cursor-pointer w-full flex items-center justify-center gap-2 bg-white border border-gray-300 text-[#666666] py-2 px-4 rounded-full hover:bg-gray-50 transition" onClick={RegisterUsingGoogle}>
               <FcGoogle className="text-xl" />
               <span>Continue with Google</span>
             </button>
