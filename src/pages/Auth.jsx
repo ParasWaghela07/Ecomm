@@ -25,7 +25,7 @@ const Auth = () => {
   const [loginBtnEnabled, setLoginBtnEnabled] = useState(true);
 
   const [loginBtnLoader, setLoginBtnLoader] = useState(true);
-  
+
   const [setPasswordBtn, setSetPasswordBtn] = useState(false);
 
   useEffect(()=>{
@@ -132,7 +132,6 @@ const Auth = () => {
 
   async function registerHandler() {
     if(!password) return enqueueSnackbar("Password must be 6-digit long", { preventDuplicate:true,variant: 'error' });
-    return;
     try{
       const user=await registerWithEmailAndPassword(email, password);
       const response = await fetch('http://localhost:4000/register', {
@@ -298,7 +297,7 @@ const Auth = () => {
               />
             </div>
 
-            <button className={`w-full ${setPasswordBtn ? 'bg-[#505b9a]' : 'bg-[#c3c3c3]'} text-white py-2 px-4 rounded-full hover:bg-[#b7b7b7] transition cursor-pointer`} onClick={registerHandler}>
+            <button className={`w-full ${setPasswordBtn ? 'bg-[#505b9a]' : 'bg-[#c3c3c3]'} text-white py-2 px-4 rounded-full transition cursor-pointer`} onClick={registerHandler}>
               Create Account
             </button>
           </div>)}
