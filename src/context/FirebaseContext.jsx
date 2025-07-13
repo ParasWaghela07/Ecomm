@@ -29,6 +29,7 @@ export default function FirebaseContextProvider({ children }) {
 
   const [user, setUser] = useState(null);
   const googleProvider = new GoogleAuthProvider();
+  const [loading,setloading] = useState(false);
 
 
 useEffect(() => {
@@ -93,6 +94,8 @@ useEffect(() => {
     signInWithGoogle,
     logout,
     user,
+    loading,
+    setloading,
   };
 
   return (

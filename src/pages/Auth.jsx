@@ -5,6 +5,10 @@ import { useContext } from 'react';
 import { useState } from 'react';
 import OtpInput from 'react-otp-input'
 import { useNavigate } from 'react-router-dom';
+import { enqueueSnackbar } from 'notistack';
+import {toast} from 'react-hot-toast';
+import { ScaleLoader } from 'react-spinners';
+
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -15,14 +19,34 @@ const Auth = () => {
   const [OTP, setOTP] = useState("");
   const [password, setPassword] = useState("");
 
+  const [otpBtnEnabled, setOtpBtnEnabled] = useState(false);
+  const [sendOtpBtn,setsendOtpBtn]=useState(false);
+
+  const [loginBtnEnabled, setLoginBtnEnabled] = useState(true);
+
+  const [loginBtnLoader, setLoginBtnLoader] = useState(true);
+  
+  const [setPasswordBtn, setSetPasswordBtn] = useState(false);
+
+  useEffect(()=>{
+    if(password.length >= 6) setSetPasswordBtn(true);
+    else setSetPasswordBtn(false);
+  },[password])
+
+
   useEffect(() => {
     setEmail("");
     setOTP("");
     setPassword("");
   },[login])
 
+  useEffect(()=>{
+    if(email.length===0 || password.length===0) setLoginBtnEnabled(false);
+    else setLoginBtnEnabled(true);
+  },[email,password])
 
-  const {signInWithGoogle,registerWithEmailAndPassword,loginWithEmailAndPassword} = useContext(FirebaseContext);
+
+  const {signInWithGoogle,registerWithEmailAndPassword,loginWithEmailAndPassword,setloading} = useContext(FirebaseContext);
 
   const RegisterUsingGoogle = async () => {
     try{
@@ -54,6 +78,8 @@ const Auth = () => {
   }
 
   async function otpHandler() {
+    if(!email) return enqueueSnackbar("Please enter your email", { preventDuplicate:true,variant: 'error' });
+    setState('otp');
     try{
       const response = await fetch('http://localhost:4000/SendOtp', {
         method: 'POST',
@@ -65,7 +91,8 @@ const Auth = () => {
 
       const data = await response.json();
       if(data.success){
-        console.log("OTP sent successfully");
+        enqueueSnackbar("OTP sent successfully", { variant: 'success' });
+        setOtpBtnEnabled(true);
         setState('otp');
       } else {
         console.error("Failed to send OTP:", data.message);
@@ -74,10 +101,12 @@ const Auth = () => {
     catch(e){
       console.error("Error sending OTP:", e);
     }
-
   }
 
   async function otpMatchHandler() {
+    if(!OTP || OTP.length !== 6) return enqueueSnackbar("Please enter a valid 6-digit OTP", { preventDuplicate:true,variant: 'error' });
+    if(!otpBtnEnabled) return;
+    
     try{
       const response = await fetch('http://localhost:4000/MatchOtp', {
         method: 'POST',
@@ -91,8 +120,9 @@ const Auth = () => {
       if(data.success){
         console.log("OTP matched successfully");
         setState('password');
+        setOtpBtnEnabled(false);
       } else {
-        console.error("Failed to match OTP:", data.message);
+        enqueueSnackbar("Invalid OTP, please try again", { preventDuplicate:true,variant: 'error' });
       }
     }
     catch(e){
@@ -101,6 +131,8 @@ const Auth = () => {
   }
 
   async function registerHandler() {
+    if(!password) return enqueueSnackbar("Password must be 6-digit long", { preventDuplicate:true,variant: 'error' });
+    return;
     try{
       const user=await registerWithEmailAndPassword(email, password);
       const response = await fetch('http://localhost:4000/register', {
@@ -130,6 +162,8 @@ const Auth = () => {
   }
 
   async function loginHandler() {
+    if(!email || !password) return enqueueSnackbar("Please enter your email and password", { preventDuplicate:true,variant: 'error' });
+    setLoginBtnLoader(false);
     try{
       const user = await loginWithEmailAndPassword(email, password);
       if(user){
@@ -142,7 +176,16 @@ const Auth = () => {
     catch(e){
       console.error("Error during login:", e);
     }
+    finally{
+      setLoginBtnLoader(true);
+    }
+
   }
+
+  useEffect(()=>{
+    if(email.length==0 || password.length===0) setsendOtpBtn(false);
+    if(email.length>0) setsendOtpBtn(true);
+  },[email ,password])
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#1A2433]">
@@ -182,7 +225,7 @@ const Auth = () => {
               />
             </div>
 
-            <button className="w-full bg-[#c3c3c3] text-white py-2 px-4 rounded-full hover:bg-[#b7b7b7] transition cursor-pointer" onClick={otpHandler}>
+            <button className={`w-full ${sendOtpBtn ? 'bg-[#505b9a]' : 'bg-[#c3c3c3]'} text-white py-2 px-4 rounded-full  transition cursor-pointer`} onClick={otpHandler}>
               Send OTP
             </button>
           </div>)}
@@ -231,7 +274,7 @@ const Auth = () => {
                             }}
                           />
                     <button 
-                      className="w-full bg-[#c3c3c3] text-white py-2 px-4 rounded-full hover:bg-[#b7b7b7] transition cursor-pointer" 
+                      className={`w-full ${otpBtnEnabled ? 'bg-[#505b9a]' : 'bg-[#c3c3c3]'} text-white py-2 px-4 rounded-full  transition cursor-pointer`} 
                       onClick={otpMatchHandler}
                     >
                       Verify OTP
@@ -255,7 +298,7 @@ const Auth = () => {
               />
             </div>
 
-            <button className="w-full bg-[#c3c3c3] text-white py-2 px-4 rounded-full hover:bg-[#b7b7b7] transition cursor-pointer" onClick={registerHandler}>
+            <button className={`w-full ${setPasswordBtn ? 'bg-[#505b9a]' : 'bg-[#c3c3c3]'} text-white py-2 px-4 rounded-full hover:bg-[#b7b7b7] transition cursor-pointer`} onClick={registerHandler}>
               Create Account
             </button>
           </div>)}
@@ -320,8 +363,8 @@ const Auth = () => {
               />
             </div>
 
-            <button className="w-full bg-[#c3c3c3] text-white py-2 px-4 rounded-full hover:bg-[#b7b7b7] transition cursor-pointer" onClick={loginHandler}>
-              Log in
+            <button className={`w-full ${loginBtnEnabled ? 'bg-[#505b9a]' :'bg-[#c3c3c3]'} text-white py-2 px-4 rounded-full transition cursor-pointer`} onClick={loginHandler}>
+              {loginBtnLoader ? 'Log in' : <ScaleLoader color="#ffffff" height={10} width={5} radius={2} margin={2} />}
             </button>
           </div>
 
