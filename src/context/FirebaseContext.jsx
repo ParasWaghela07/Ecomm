@@ -1,5 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import { initializeApp } from "firebase/app";
+import {toast} from "react-hot-toast";
 import {
   getAuth,
   onAuthStateChanged,
@@ -33,12 +34,14 @@ export default function FirebaseContextProvider({ children }) {
 
 
 useEffect(() => {
-  const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+  setloading(true);
+  const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
     setUser(firebaseUser || null);
+    setloading(false);
   });
-
   return () => unsubscribe();
 }, []);
+
 
 
   async function registerWithEmailAndPassword(email, password) {

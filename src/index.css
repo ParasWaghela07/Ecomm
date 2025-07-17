@@ -5,8 +5,6 @@
 html, body, #root {
   height: 100%;
   width: 100%;
-  overflow: hidden; /* Prevent default scrolling */
-  position: fixed; /* Lock the viewport */
 }
 
 

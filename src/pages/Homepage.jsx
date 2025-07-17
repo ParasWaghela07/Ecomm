@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { FirebaseContext } from '../context/FirebaseContext';
-
+import {sampleShoes} from '../ProductData';
 const Homepage = () => {
   // Get user and logout function from context
   const { user, logout } = useContext(FirebaseContext);
@@ -40,6 +40,17 @@ const Homepage = () => {
                 {new Date(user.metadata.creationTime).toLocaleString()}
               </p>
             </div>
+
+            {sampleShoes.map((shoe,index)=>{
+              return (
+                <div key={index} className="mt-4 p-4 bg-gray-50 rounded-md overflow-y-auto">
+                  <img src={shoe.imageUrl} alt="" className='w-50 aspect-square'/>
+                  <h2 className="text-lg font-semibold">{shoe.name}</h2>
+                  <p className="text-sm text-gray-600">{shoe.description}</p>
+                  <p className="text-md font-bold mt-2">${shoe.price}</p>
+                </div>
+              );
+            })}
             
             <button
               onClick={logout}

@@ -188,14 +188,16 @@ const Auth = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#1A2433]">
-      {/* Infinite scrolling background */}
+     
       <div className="seamless-scroller">
         <div className="scroll-layer"></div>
         <div className="scroll-layer"></div>
       </div>
 
+      {/* <video src='bg_vid.mp4' autoPlay muted loop
+      className="absolute top-0 left-0 w-full h-full object-cover z-[-1]"></video> */}
       {!login && (
-        <div className="relative flex justify-center items-center min-h-screen bg-opacity-50 backdrop-blur-sm">
+        <div className="relative flex justify-center items-center min-h-screen bg-opacity-50 backdrop-blur-xs z-[1]">
         <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md mx-4">
           {/* Header */}
           <div className="text-center mb-6 flex flex-col items-center">
