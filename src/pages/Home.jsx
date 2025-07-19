@@ -10,6 +10,8 @@ import { FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
 import Footer from "../components/Footer";
 const Home = () => {
   const [products,setproducts]=useState([]);
+  const [visibleProducts,setvisibleProducts]=useState([]);
+
   async function fetchProducts(){
     try{
     const response = await fetch('http://localhost:4000/getAllProducts', {
@@ -23,6 +25,11 @@ const Home = () => {
         console.log(data);
         if(data.success){
           setproducts(data.products);
+          let vis=[];
+          for(let i=0;i<8;i++){
+            vis.push(data.products[i]);
+          }
+          setvisibleProducts(vis);
         }
     }
     catch(e){
@@ -32,24 +39,31 @@ const Home = () => {
   useEffect(()=>{
     fetchProducts();
   },[])
+
+  const styles = {
+  navigation: {
+    '--swiper-navigation-color': 'black', // Change to your desired color
+    '--swiper-navigation-size': '34px', // Optional: change size
+  }
+};
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navbar at the top */}
       <Navbar />
 
       {/* Main content area */}
-      <main className="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8  py-8">
+      <main className="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 py-10 mt-10 ">
         {/* Hero section */}
         <Swiper
           modules={[Autoplay]}
-          autoplay={{ delay: 3000 }}
+          autoplay={{ delay: 1750 }}
           loop={true}
           slidesPerView={1}
           spaceBetween={50}
           allowTouchMove={false}
         >
           <SwiperSlide>
-            <div className="flex flex-col md:flex-row h-[80vh]">
+            <div className="flex flex-col md:flex-row h-[80vh] ">
               <div className="w-full md:w-1/2 bg-[#1A2433] flex items-center justify-center p-12">
                 <div className="text-white">
                   <span className="text-sm uppercase tracking-widest text-gray-400">
@@ -77,7 +91,7 @@ const Home = () => {
           </SwiperSlide>
 
           <SwiperSlide>
-            <div className="relative h-[80vh]">
+            <div className="relative h-[80vh] bg-gradient-to-br from-gray-100 to-gray-300">
               <div className="absolute inset-0 flex items-center">
                 <div className="container mx-auto px-6 z-10">
                   <h1 className="text-5xl md:text-7xl font-bold mb-4">
@@ -91,7 +105,7 @@ const Home = () => {
                   </button>
                 </div>
               </div>
-              <div className="absolute right-0 bottom-0 w-1/2 h-full">
+              <div className="absolute right-0 bottom-0 w-1/2 h-full bg-[#1A2433]">
                 <img
                   src="/shoebg.png"
                   alt="Featured Shoe"
@@ -173,6 +187,7 @@ const Home = () => {
           <div className="md:hidden">
             <Swiper
               modules={[Navigation, Pagination]}
+              style={styles.navigation}
               spaceBetween={20}
               slidesPerView={1.2}
               centeredSlides={true}
@@ -353,8 +368,8 @@ const Home = () => {
 
           {/* Product Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {products?.length > 0 && 
-              products.map((product, index) => (
+            {visibleProducts?.length > 0 && 
+              visibleProducts.map((product, index) => (
                 <div key={index} className="group relative bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
                   <div className="relative h-80 overflow-hidden">
                     <img 
@@ -390,7 +405,7 @@ const Home = () => {
                         </div>
                       </div>
                     </div>
-                    <button className="mt-4 w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors">
+                    <button className="mt-4 w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors cursor-pointer">
                       Add to Cart
                     </button>
                   </div>
@@ -408,9 +423,9 @@ const Home = () => {
         </section>
 
         {/* Shipping & Returns Section */}
-        <section className="py-16 bg-gray-50">
+        <section className="py-10 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8 text-center">
               {/* Free Shipping */}
               <div className="p-6">
                 <div className="mx-auto h-12 w-12 flex items-center justify-center bg-black rounded-full mb-4">
@@ -443,13 +458,35 @@ const Home = () => {
                 <h3 className="text-lg font-medium mb-2">24/7 Support</h3>
                 <p className="text-gray-600">Dedicated customer service</p>
               </div>
+
+              {/* Secure Payments - New Element */}
+              <div className="p-6">
+                <div className="mx-auto h-12 w-12 flex items-center justify-center bg-black rounded-full mb-4">
+                  <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-medium mb-2">Secure Payments</h3>
+                <p className="text-gray-600">SSL encrypted checkout</p>
+              </div>
+
+              {/* Eco-Friendly - New Element */}
+              <div className="p-6">
+                <div className="mx-auto h-12 w-12 flex items-center justify-center bg-black rounded-full mb-4">
+                  <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-medium mb-2">Eco-Friendly</h3>
+                <p className="text-gray-600">Sustainable materials</p>
+              </div>
             </div>
           </div>
         </section>
 
 
         {/* Limited Offer Banner */}
-        <section className="py-12 bg-gradient-to-r from-red-500 to-orange-500 text-white">
+        <section className="py-10 bg-gradient-to-r from-red-500 to-orange-500 text-white">
           <div className="max-w-7xl mx-aut px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl font-bold mb-4">Last Chance - Summer Sale Ends Soon!</h2>
             <p className="text-xl mb-6">Get 20% off all summer collection shoes</p>

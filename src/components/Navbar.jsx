@@ -8,7 +8,7 @@ const Navbar = () => {
   const { user, logout, cart } = useContext(FirebaseContext);
 
   return (
-    <nav className="bg-white shadow-md">
+    <nav className="bg-white shadow-md fixed top-0 w-full z-2">
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* Logo and main nav items (left side) */}

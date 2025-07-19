@@ -11,9 +11,9 @@ function App() {
   return (
     <div className=""> 
       <Routes>
-        <Route path="/" element={<h1><Homepage/></h1>} />
+        <Route path="/home" element={<h1><Homepage/></h1>} />
         <Route path="/Auth" element={<Auth />} />
-        <Route path='/home' element={<Home/>}/>
+        <Route path='/' element={<Home/>}/>
       </Routes>
 
       {loading && (

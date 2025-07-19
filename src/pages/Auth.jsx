@@ -67,7 +67,7 @@ const Auth = () => {
       const data = await response.json();
       if(data.success){
         console.log("User registered successfully:", data.user);
-        navigate('/home');
+        navigate('/');
       } else {
         console.error("Registration failed:", data.message);
       }
@@ -150,7 +150,7 @@ const Auth = () => {
       const data = await response.json();
       if(data.success){
         console.log("User registered successfully");
-        navigate('/home');
+        navigate('/');
       } else {
         console.error("Registration failed:", data.message);
       }
@@ -167,7 +167,7 @@ const Auth = () => {
       const user = await loginWithEmailAndPassword(email, password);
       if(user){
         console.log("User logged in successfully");
-        navigate('/home');
+        navigate('/');
       } else {
         console.error("Login failed");
       }
@@ -194,8 +194,6 @@ const Auth = () => {
         <div className="scroll-layer"></div>
       </div>
 
-      {/* <video src='bg_vid.mp4' autoPlay muted loop
-      className="absolute top-0 left-0 w-full h-full object-cover z-[-1]"></video> */}
       {!login && (
         <div className="relative flex justify-center items-center min-h-screen bg-opacity-50 backdrop-blur-xs z-[1]">
         <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md mx-4">
