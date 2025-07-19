@@ -1,7 +1,4 @@
-// const mongoose = require('mongoose');
-// const Product = require('./Product'); // Assuming your schema is in Product.js
-
-export const sampleShoes = [
+const sampleShoes = [
   {
     name: "Nike Air Max 270",
     description: "Revolutionary cushioning with the biggest Air unit yet for all-day comfort.",
@@ -310,29 +307,4 @@ export const sampleShoes = [
   }
 ];
 
-
-
-// Function to insert sample data
-// const insertSampleProducts = async () => {
-//   try {
-//     await mongoose.connect('mongodb://localhost:27017/your-database-name', {
-//       useNewUrlParser: true,
-//       useUnifiedTopology: true
-//     });
-
-//     // Clear existing products
-//     await Product.deleteMany({});
-//     console.log('Deleted existing products');
-
-//     // Insert new sample products
-//     const createdProducts = await Product.insertMany(sampleShoes);
-//     console.log(`Created ${createdProducts.length} products`);
-
-//     mongoose.connection.close();
-//   } catch (error) {
-//     console.error('Error inserting sample data:', error);
-//     mongoose.connection.close();
-//   }
-// };
-
-// insertSampleProducts();
+module.exports=sampleShoes;

@@ -128,3 +128,13 @@ exports.deleteProduct = async (req, res) => {
         });
     }
 }
+
+exports.getAllProducts=async(req,res)=>{
+    try{
+        const products=await Product.find({}).populate('reviews.userId');
+        return res.json({success:true,products:products})
+    }
+    catch(e){
+        return res.json({success:false,message:"Error during fetching products"})
+    }
+}

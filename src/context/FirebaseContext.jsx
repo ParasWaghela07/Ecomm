@@ -5,7 +5,6 @@ import {
   getAuth,
   onAuthStateChanged,
   createUserWithEmailAndPassword,
-  RecaptchaVerifier,
   GoogleAuthProvider,
   signInWithPopup,
   signOut,
@@ -29,18 +28,53 @@ export default function FirebaseContextProvider({ children }) {
   const auth = getAuth(app);
 
   const [user, setUser] = useState(null);
+  const [cart,setcart]=useState([]);
+
   const googleProvider = new GoogleAuthProvider();
   const [loading,setloading] = useState(false);
 
+ async function fetchCartData() {
+  try {
+    const token = await user.getIdToken();
 
-useEffect(() => {
-  setloading(true);
-  const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-    setUser(firebaseUser || null);
-    setloading(false);
-  });
-  return () => unsubscribe();
-}, []);
+    const response = await fetch('http://localhost:4000/getCartItems', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+    console.log("Cart data fetched:", data);
+    if (data.success) {
+      setcart(data.cart);
+    } else {
+      console.error("Failed to fetch cart data:", data.message);
+      toast.error("Failed to fetch cart data.");
+    }
+  } catch (e) {
+    console.error("Error fetching cart data:", e);
+    toast.error("An error occurred while fetching cart data.");
+  }
+  }
+
+  useEffect(()=>{
+    if (user) {
+      fetchCartData();
+    } else {
+      setcart([]);
+    }
+  },[user]);
+  useEffect(() => {
+    setloading(true);
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser || null);
+      console.log(firebaseUser);
+      setloading(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
 
 
@@ -99,6 +133,8 @@ useEffect(() => {
     user,
     loading,
     setloading,
+    cart,
+    setcart
   };
 
   return (

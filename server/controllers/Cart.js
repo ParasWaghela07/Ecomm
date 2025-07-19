@@ -2,8 +2,7 @@ const User=require('../models/User');
 
 exports.addToCart=async(req,res)=>{
     try{
-        const {productId,quantity}=req.body;
-
+        const {productId,quantity,size}=req.body;
         if(!productId || !quantity){
             return res.status(400).json({
                 success:false,
@@ -24,10 +23,10 @@ exports.addToCart=async(req,res)=>{
 
         const existingProductIndex = user.cart.findIndex(item => item.product._id.toString() === productId);
 
-        if(existingProductIndex > -1){
+        if(existingProductIndex > -1 && user.cart[existingProductIndex].size==size){
             user.cart[existingProductIndex].quantity += quantity;
         } else {
-            user.cart.push({product: productId, quantity: quantity});
+            user.cart.push({product: productId, quantity: quantity,size:size});
         }
 
         await user.save();

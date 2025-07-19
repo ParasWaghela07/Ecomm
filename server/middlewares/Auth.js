@@ -19,7 +19,7 @@ exports.isUser = async (req, res, next) => {
     const decoded = await admin.auth().verifyIdToken(token);
     
     req.payload = decoded;
-    console.log("Decoded payload:", decoded);
+    // console.log("Decoded payload:", decoded);
     next();
   } catch (error) {
     return res.status(401).json({ message: "Token verification failed" });

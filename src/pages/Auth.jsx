@@ -67,7 +67,7 @@ const Auth = () => {
       const data = await response.json();
       if(data.success){
         console.log("User registered successfully:", data.user);
-        navigate('/');
+        navigate('/home');
       } else {
         console.error("Registration failed:", data.message);
       }
@@ -150,7 +150,7 @@ const Auth = () => {
       const data = await response.json();
       if(data.success){
         console.log("User registered successfully");
-        navigate('/');
+        navigate('/home');
       } else {
         console.error("Registration failed:", data.message);
       }
@@ -167,7 +167,7 @@ const Auth = () => {
       const user = await loginWithEmailAndPassword(email, password);
       if(user){
         console.log("User logged in successfully");
-        navigate('/');
+        navigate('/home');
       } else {
         console.error("Login failed");
       }
