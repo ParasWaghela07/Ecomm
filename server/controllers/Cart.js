@@ -1,72 +1,98 @@
 const User=require('../models/User');
 
-exports.addToCart=async(req,res)=>{
-    try{
-        const {productId,quantity,size}=req.body;
-        if(!productId || !quantity){
+exports.addToCart = async (req, res) => {
+    try {
+        const { productId, quantity, size } = req.body;
+        if (!productId || !quantity) {
             return res.status(400).json({
-                success:false,
-                message:"Please provide productId and quantity",
+                success: false,
+                message: "Please provide productId and quantity",
             });
         }
 
-        const user=await User.findOne({firebaseUid:req.payload.uid}).populate('cart.product');
-
+        // First find the user without populating
+        let user = await User.findOne({ firebaseUid: req.payload.uid });
         
-        if(!user){
+        if (!user) {
             return res.status(404).json({
-                success:false,
-                message:"User not found",
+                success: false,
+                message: "User not found",
             });
         }
 
+        const existingProductIndex = user.cart.findIndex(
+            item => item.product.toString() === productId && item.size === size
+        );
 
-        const existingProductIndex = user.cart.findIndex(item => item.product._id.toString() === productId);
-
-        if(existingProductIndex > -1 && user.cart[existingProductIndex].size==size){
+        if (existingProductIndex > -1) {
             user.cart[existingProductIndex].quantity += quantity;
         } else {
-            user.cart.push({product: productId, quantity: quantity,size:size});
+            user.cart.push({ product: productId, quantity: quantity, size: size });
         }
 
+        // Save the user first
         await user.save();
 
+        // Then find the user again with populated cart
+        user = await User.findOne({ firebaseUid: req.payload.uid })
+            .populate('cart.product');
+
         return res.status(200).json({
-            success:true,
-            message:"Product added to cart successfully",
-            cart:user.cart,
+            success: true,
+            message: "Product added to cart successfully",
+            cart: user.cart,
         });
     }
-    catch(e){
+    catch (e) {
         console.log(e);
         return res.status(500).json({
-            success:false,
-            message:"Internal server error while adding to cart",
+            success: false,
+            message: "Internal server error while adding to cart",
         });
     }
 }
 
-exports.deleteFromCart=async(req,res)=>{
-    try{
-        const {productId,quantity}=req.body;
+exports.deleteFromCart = async (req, res) => {
+    try {
+        const { productId, quantity, size } = req.body;
 
-        if(!productId || !quantity){
+        // Input validation
+        if (!productId || !quantity || !size) {
             return res.status(400).json({
-                success:false,
-                message:"Please provide productId",
+                success: false,
+                message: "Please provide productId, quantity, and size",
             });
         }
 
-        const user=await User.finedOne({firebaseUid:req.payload.uid}).populate('cart.product');
-        if(!user){
+        if (isNaN(quantity) || quantity <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Quantity must be a positive number",
+            });
+        }
+
+        // Find user without populating cart for better performance
+        const user = await User.findOne({ firebaseUid: req.payload.uid });
+        if (!user) {
             return res.status(404).json({
-                success:false,
-                message:"User not found",
+                success: false,
+                message: "User not found",
             });
         }
-        const existingProductIndex = user.cart.findIndex(item => item.product._id.toString() === productId);
 
+        // Find item in cart
+        const existingProductIndex = user.cart.findIndex(
+            item => item.product.toString() === productId && item.size === size
+        );
 
+        if (existingProductIndex === -1) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found in cart",
+            });
+        }
+
+        // Update or remove item
         if (user.cart[existingProductIndex].quantity <= quantity) {
             user.cart.splice(existingProductIndex, 1);
         } else {
@@ -75,17 +101,19 @@ exports.deleteFromCart=async(req,res)=>{
 
         await user.save();
 
+        // Optionally populate here if you need product details in response
+        const updatedUser = await User.findById(user._id).populate('cart.product');
+
         return res.status(200).json({
             success: true,
             message: "Product updated in cart",
-            cart: user.cart
+            cart: updatedUser.cart
         });
-    }
-    catch(e){
-        console.log(e);
+    } catch (e) {
+        console.error("Error deleting from cart:", e);
         return res.status(500).json({
-            success:false,
-            message:"Internal server error while deleting from cart",
+            success: false,
+            message: "Internal server error while deleting from cart",
         });
     }
 }

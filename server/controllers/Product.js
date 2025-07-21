@@ -1,5 +1,66 @@
 const Product = require('../models/Product');
 const Category = require('../models/Category');
+const sampleShoes=require('../ProductData');
+
+// exports.seedDatabase = async (req, res) => {
+//   try {
+//     return res.json({success:true})
+//     // Clear existing data (optional)
+//     await Product.deleteMany({});
+//     await Category.deleteMany({});
+
+//     // Process each sample shoe
+//     for (const shoe of sampleShoes) {
+//       // Create or update product
+//       const newProduct = new Product({
+//         name: shoe.name,
+//         description: shoe.description,
+//         price: shoe.price,
+//         imageUrl: shoe.imageUrl,
+//         category: shoe.category,
+//         quantity: shoe.quantity,
+//         ratings: shoe.ratings,
+//         unitSold: shoe.unitSold,
+//         offer: shoe.offer || ''
+//       });
+
+//       await newProduct.save();
+
+//       // Handle category
+//       let category = await Category.findOne({ name: shoe.category });
+      
+//       if (!category) {
+//         // Create new category if it doesn't exist
+//         category = new Category({
+//           name: shoe.category,
+//           products: [newProduct._id],
+//           description: `${shoe.category} shoes collection`,
+//           imageUrl: shoe.imageUrl
+//         });
+//       } else {
+//         // Add product to existing category
+//         if (!category.products.includes(newProduct._id)) {
+//           category.products.push(newProduct._id);
+//         }
+//       }
+      
+//       await category.save();
+//     }
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "Database seeded successfully with sample products and categories",
+//       productCount: sampleShoes.length
+//     });
+
+//   } catch (error) {
+//     console.error("Error seeding database:", error);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Internal server error while seeding database"
+//     });
+//   }
+// };
 
 exports.addProduct = async (req, res) => {
     try {
@@ -20,7 +81,7 @@ exports.addProduct = async (req, res) => {
             const newCategory = new Category({
                 name: category,
                 products: [newProduct._id],
-                imageUrl: "default_image_url.jpg"
+                imageUrl: imageUrl
             });
             await newCategory.save();
         }
@@ -136,5 +197,21 @@ exports.getAllProducts=async(req,res)=>{
     }
     catch(e){
         return res.json({success:false,message:"Error during fetching products"})
+    }
+}
+
+exports.getAllCategories = async (req, res) => {
+    try {
+        const categories = await Category.find({}).populate('products');
+        return res.status(200).json({
+            success: true,
+            categories: categories
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error while fetching categories"
+        });
     }
 }

@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { FiShoppingCart, FiUser, FiMenu, FiX, FiLogIn, FiLogOut } from 'react-icons/fi';
 import { useContext } from 'react';
 import { FirebaseContext } from '../context/FirebaseContext';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, logout, cart } = useContext(FirebaseContext);
+  const navigate=useNavigate();
 
   return (
     <nav className="bg-white shadow-md fixed top-0 w-full z-2">
@@ -14,7 +16,8 @@ const Navbar = () => {
           {/* Logo and main nav items (left side) */}
           <div className="flex items-center">
             {/* Logo */}
-            <div className="flex-shrink-0 flex items-center cursor-pointer">
+            <div className="flex-shrink-0 flex items-center cursor-pointer" onClick={()=>navigate('/')
+            }>
               <span className="text-xl font-bold text-gray-800">HomePage</span>
             </div>
             
@@ -39,7 +42,7 @@ const Navbar = () => {
           <div className="hidden md:ml-6 md:flex md:items-center gap-x-3">
             {/* Cart button */}
             <button className="p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none cursor-pointer">
-              <div className="flex items-center relative">
+              <div className="flex items-center relative" onClick={()=>navigate('/mycart')}>
                 <span className="ml-1 text-sm">My Cart</span>
                 <div className="relative ml-1">
                   <FiShoppingCart className="h-6 w-6" />

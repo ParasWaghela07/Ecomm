@@ -102,15 +102,15 @@ async function addtocart(item) {
   slidesPerView={1}
   spaceBetween={20}
 >
-  <SwiperSlide><img src="shoebg.png" /></SwiperSlide>
-  <SwiperSlide><img src="shoebg.png" /></SwiperSlide>
-  <SwiperSlide><img src="shoebg.png" /></SwiperSlide>
+  <SwiperSlide><img loading='lazy'  src="shoebg.png" /></SwiperSlide>
+  <SwiperSlide><img loading='lazy'  src="shoebg.png" /></SwiperSlide>
+  <SwiperSlide><img loading='lazy'  src="shoebg.png" /></SwiperSlide>
 </Swiper>
 
             
             {user.photoURL && (
               <div className="flex justify-center">
-                <img 
+                <img loading='lazy'  
                   src={user.photoURL} 
                   alt="Profile" 
                   className="w-20 h-20 rounded-full"
@@ -140,7 +140,7 @@ async function addtocart(item) {
             {products?.map((shoe,index)=>{
               return (
                 <div key={index} className="mt-4 p-4 bg-gray-50 rounded-md overflow-y-auto">
-                  <img src={shoe.imageUrl} alt="" className='w-50 aspect-square'/>
+                  <img loading='lazy'  src={shoe.imageUrl} alt="" className='w-50 aspect-square'/>
                   <h2 className="text-lg font-semibold">{shoe.name}</h2>
                   <p className="text-sm text-gray-600">{shoe.description}</p>
                   <p className="text-md font-bold mt-2">${shoe.price}</p>

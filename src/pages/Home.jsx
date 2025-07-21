@@ -5,40 +5,26 @@ import "swiper/css/autoplay";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
 import Footer from "../components/Footer";
+import { FirebaseContext } from "../context/FirebaseContext";
+import { toast } from "react-hot-toast";
+import ShowProducts from "../components/ShowProducts";
+import { useNavigate } from "react-router-dom";
+import CategoryCard from "../components/CategoryCard";
+
 const Home = () => {
-  const [products,setproducts]=useState([]);
   const [visibleProducts,setvisibleProducts]=useState([]);
-
-  async function fetchProducts(){
-    try{
-    const response = await fetch('http://localhost:4000/getAllProducts', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        const data=await response.json();
-        console.log(data);
-        if(data.success){
-          setproducts(data.products);
-          let vis=[];
-          for(let i=0;i<8;i++){
-            vis.push(data.products[i]);
-          }
-          setvisibleProducts(vis);
-        }
-    }
-    catch(e){
-      toast.error(e.message);
-    }
-  }
+  const [size, setSize] = useState('M'); // Default size
+  const {user,setcart,products,category}=useContext(FirebaseContext);
+  const navigate=useNavigate();
   useEffect(()=>{
-    fetchProducts();
-  },[])
+    if(products && products.length > 0) {
+      setvisibleProducts(products.slice(0, 8));
+    }
+  },[products]);
+
 
   const styles = {
   navigation: {
@@ -202,39 +188,18 @@ const Home = () => {
                 },
               }}
             >
-              {[
-                {
-                  title: "Running",
-                  img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-                },
-                {
-                  title: "Sneakers",
-                  img: "https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=765&q=80",
-                },
-                {
-                  title: "Basketball",
-                  img: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
-                },
-                {
-                  title: "Casual",
-                  img: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=764&q=80",
-                },
-                {
-                  title: "Hiking",
-                  img: "https://images.unsplash.com/photo-1460353581641-37baddab0fa2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1171&q=80",
-                },
-              ].map((category, index) => (
+              {category.map((category, index) => (
                 <SwiperSlide key={index}>
                   <div className="group relative overflow-hidden rounded-lg bg-gray-100 h-64 mx-2">
                     <img
-                      src={category.img}
-                      alt={`${category.title} Shoes`}
+                      src={category.imageUrl}
+                      alt={`${category.name} Shoes`}
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-6">
                       <div>
                         <h3 className="text-xl font-bold text-white">
-                          {category.title}
+                          {category.name}
                         </h3>
                         <button className="mt-2 text-sm text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                           Shop Now →
@@ -249,90 +214,9 @@ const Home = () => {
 
           {/* Desktop Grid (hidden on mobile) */}
           <div className="hidden md:grid grid-cols-3 lg:grid-cols-5 gap-6">
-            {/* Running Shoes */}
-            <div className="group relative overflow-hidden rounded-lg bg-gray-100 h-64">
-              <img
-                src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80"
-                alt="Running Shoes"
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-6">
-                <div>
-                  <h3 className="text-xl font-bold text-white">Running</h3>
-                  <button className="mt-2 text-sm text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    Shop Now →
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Sneakers */}
-            <div className="group relative overflow-hidden rounded-lg bg-gray-100 h-64">
-              <img
-                src="https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=765&q=80"
-                alt="Sneakers"
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-6">
-                <div>
-                  <h3 className="text-xl font-bold text-white">Sneakers</h3>
-                  <button className="mt-2 text-sm text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    Shop Now →
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Basketball */}
-            <div className="group relative overflow-hidden rounded-lg bg-gray-100 h-64">
-              <img
-                src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"
-                alt="Basketball Shoes"
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-6">
-                <div>
-                  <h3 className="text-xl font-bold text-white">Basketball</h3>
-                  <button className="mt-2 text-sm text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    Shop Now →
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Casual */}
-            <div className="group relative overflow-hidden rounded-lg bg-gray-100 h-64">
-              <img
-                src="https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=764&q=80"
-                alt="Casual Shoes"
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-6">
-                <div>
-                  <h3 className="text-xl font-bold text-white">Casual</h3>
-                  <button className="mt-2 text-sm text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    Shop Now →
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Hiking */}
-            <div className="group relative overflow-hidden rounded-lg bg-gray-100 h-64">
-              <img
-                src="https://images.unsplash.com/photo-1460353581641-37baddab0fa2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1171&q=80"
-                alt="Hiking Shoes"
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-6">
-                <div>
-                  <h3 className="text-xl font-bold text-white">Hiking</h3>
-                  <button className="mt-2 text-sm text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    Shop Now →
-                  </button>
-                </div>
-              </div>
-            </div>
+            {category.map((cat, index) => (
+              <CategoryCard key={index} category={cat} />
+            ))}
           </div>
         </section>
 
@@ -366,56 +250,11 @@ const Home = () => {
             </div>
           </div>
 
-          {/* Product Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {visibleProducts?.length > 0 && 
-              visibleProducts.map((product, index) => (
-                <div key={index} className="group relative bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
-                  <div className="relative h-80 overflow-hidden">
-                    <img 
-                      src={product.imageUrl} 
-                      alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="text-lg font-semibold">{product.name.length > 15 ? (product.name.substr(0,15))+"..":(product.name)}</h3>
-                        <p className="text-gray-600">{product.category}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-lg font-bold">${product.price}</p>
-                        <div className="flex items-center justify-end mt-1">
-                        {[1, 2, 3, 4, 5].map((star) => {
-                          const rating = product.ratings || 0; // Default to 0 if no rating
-                          return (
-                            <span key={star} className="text-yellow-400">
-                              {rating >= star ? (
-                                <FaStar className="w-4 h-4" />
-                              ) : rating >= star - 0.5 ? (
-                                <FaStarHalfAlt className="w-4 h-4" />
-                              ) : (
-                                <FaRegStar className="w-4 h-4" />
-                              )}
-                            </span>
-                          );
-                        })}
-                          <span className="text-xs text-gray-500 ml-1">({product.reviewCount || 0})</span>
-                        </div>
-                      </div>
-                    </div>
-                    <button className="mt-4 w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors cursor-pointer">
-                      Add to Cart
-                    </button>
-                  </div>
-                </div>
-              ))
-            }
-          </div>
+          <ShowProducts visibleProducts={visibleProducts} />
+
 
           {/* View More Button */}
-          <div className="text-center mt-12 ">
+          <div className="text-center mt-12" onClick={() => navigate('/products/all')}>
             <button className="px-8 py-3 border-2 border-black rounded-lg font-medium hover:bg-black hover:text-white transition-colors cursor-pointer">
               View All Products
             </button>
@@ -515,8 +354,6 @@ const Home = () => {
           </div>
         </section>
       </main>
-
-
 
       <Footer/>
     </div>

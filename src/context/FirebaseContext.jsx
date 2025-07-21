@@ -29,9 +29,61 @@ export default function FirebaseContextProvider({ children }) {
 
   const [user, setUser] = useState(null);
   const [cart,setcart]=useState([]);
+  const [products,setproducts]=useState([]);
+  const [category,setcategory]=useState([]);
 
   const googleProvider = new GoogleAuthProvider();
   const [loading,setloading] = useState(false);
+
+  async function fetchCategories() {
+    try {
+      const response = await fetch('http://localhost:4000/getAllCategories', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+      console.log(data);
+      if (data.success) {
+        setcategory(data.categories);
+      } else {
+        toast.error("Failed to fetch categories.");
+      }
+    } catch (e) {
+      console.error("Error fetching categories:", e);
+      toast.error("An error occurred while fetching categories.");
+    }
+  }
+
+  useEffect(()=>{
+    fetchCategories();
+  },[])
+
+    async function fetchProducts(){
+    try{
+    const response = await fetch('http://localhost:4000/getAllProducts', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const data=await response.json();
+        console.log(data);
+        if(data.success){
+          data.products.sort((a,b)=>b.ratings-a.ratings)
+          setproducts(data.products);
+        }
+    }
+    catch(e){
+      toast.error(e.message);
+    }
+  }
+  useEffect(()=>{
+    fetchProducts();
+  },[])
 
  async function fetchCartData() {
   try {
@@ -134,7 +186,9 @@ export default function FirebaseContextProvider({ children }) {
     loading,
     setloading,
     cart,
-    setcart
+    setcart,
+    products,
+    category
   };
 
   return (

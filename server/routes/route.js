@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { SendOtp ,register,login,MatchOtp, AdminLogin} = require('../controllers/Auth');
-const {addProduct, editProduct,deleteProduct,getAllProducts}=require('../controllers/Product');
+const {addProduct, editProduct,deleteProduct,getAllProducts,getAllCategories}=require('../controllers/Product');
 const { isUser, isAdmin } = require('../middlewares/Auth');
 const {addToCart,deleteFromCart,getCartItems}= require('../controllers/Cart');
 const {createOrder,cancelOrder,getMyOrders,getAllOrders,approveOrder} = require('../controllers/Order');
@@ -11,12 +11,13 @@ router.post('/MatchOtp', MatchOtp);
 router.post('/register', register);
 router.post('/login', login);
 router.post('/AdminLogin', AdminLogin);
-// router.post('/AdminSignup', AdminSignup);
+
 
 router.post('/addProduct', isAdmin,addProduct);
 router.post('/editProduct',isAdmin, editProduct); 
 router.post('/deleteProduct', isAdmin, deleteProduct);
 router.get('/getAllProducts',getAllProducts);
+router.get('/getAllCategories', getAllCategories);
 
 router.post('/addtoCart', isUser,addToCart);
 router.post('/deleteFromCart', isUser,deleteFromCart);
