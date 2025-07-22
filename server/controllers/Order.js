@@ -17,7 +17,7 @@ exports.createOrder = async (req, res) => {
         }
 
         const order=await Order.create({
-            userId: userid,
+            userId: user._id,
             products: user.cart,
             totalAmount: user.cart.reduce((total, item) => total + item.product.price * item.quantity, 0),
             shippingAddress: address || user.address,
@@ -44,7 +44,7 @@ exports.cancelOrder=async(req,res)=>{
             return res.status(400).json({ message: 'Order ID is required' });
         }
 
-        const user = await User.findOne({firebaseUid:userid});
+        const user = await User.findOne({firebaseUid:userId});
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -69,9 +69,17 @@ exports.cancelOrder=async(req,res)=>{
 
 exports.getMyOrders=async(req,res)=>{
     try{
-        const userId = req.payload.id;
+        const userId = req.payload.uid;
 
-        const user = await User.findOne({firebaseUid:userId}).populate('order');
+        const user = await User.findOne({ firebaseUid: userId })
+            .populate({
+                path: 'order',  // assuming your user schema has an 'orders' array field
+                populate: {
+                path: 'products.product',  // assuming your Order schema has 'products' array with 'product' references
+                model: 'Product'  // name of your Product model
+                }
+            });
+
         if (!user) {
             return res.status(404).json({ success:false,message: 'User not found' });
         }
@@ -127,6 +135,51 @@ exports.approveOrder = async (req, res) => {
         res.status(200).json({ success:true,message: 'Order approved successfully', order });
     } catch (e) {
         console.error("Error approving order:", e);
+        res.status(500).json({ success:false,message: "Internal server error" });
+    }
+}
+
+exports.getAddress=async(req,res)=>{
+    try{
+        const userId = req.payload.uid;
+
+        const user = await User.findOne({firebaseUid:userId});
+        if (!user) {
+            return res.status(404).json({ success:false,message: 'User not found' });
+        }
+
+        if (!user.address) {
+            return res.status(404).json({ success:false,message: 'Address not found' });
+        }
+        res.status(200).json({ success:true,message: 'Address fetched successfully', address: user.address });
+    }
+    catch(e){
+        console.error("Error fetching address:", e);
+        res.status(500).json({ success:false,message: "Internal server error" });
+    }
+}
+
+exports.saveAddress=async(req,res)=>{
+    try{
+        const {address} = req.body;
+        const userId = req.payload.uid;
+
+        if (!address) {
+            return res.status(400).json({ success:false,message: 'Address is required' });
+        }
+
+        const user = await User.findOne({firebaseUid:userId});
+        if (!user) {
+            return res.status(404).json({ success:false,message: 'User not found' });
+        }
+
+        user.address = address;
+        await user.save();
+
+        res.status(200).json({ success:true,message: 'Address saved successfully', address: user.address });
+    }
+    catch(e){
+        console.error("Error saving address:", e);
         res.status(500).json({ success:false,message: "Internal server error" });
     }
 }

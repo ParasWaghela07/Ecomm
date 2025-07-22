@@ -7,6 +7,9 @@ import './App.css';
 import Home from "./pages/Home";
 import MyCart from "./pages/MyCart";
 import Products from "./pages/Products";
+import PaymentPage from "./pages/PaymentPage";
+import OrderConfirmation from "./pages/OrderConfirmation";
+import OrderHistory from "./pages/OrderHistory";
 
 function App() {
   const {loading}=useContext(FirebaseContext);
@@ -18,6 +21,9 @@ function App() {
         <Route path='/' element={<Home/>}/>
         <Route path='/mycart' element={<MyCart/>}/>
         <Route path='/products/:category' element={<Products/>}/>
+        <Route path='/payment' element={<PaymentPage/>}/>
+        <Route path="/confirmation" element={<OrderConfirmation/>} />
+        <Route path="/order-history" element={<OrderHistory/>} />
       </Routes>
 
       {loading && (

@@ -1,11 +1,12 @@
 import React, { useContext } from 'react';
 import { FirebaseContext } from '../context/FirebaseContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { toast } from 'react-hot-toast';
 
 const MyCart = () => {
   const { cart,user,setcart } = useContext(FirebaseContext);
+  const navigate=useNavigate();
   function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -279,7 +280,7 @@ const MyCart = () => {
                   </div>
                 </div>
                 
-                <button className="w-full bg-white hover:bg-gray-100 text-[#1A2433] font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2">
+                <button className="w-full bg-white hover:bg-gray-100 text-[#1A2433] font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2" onClick={()=>{navigate('/payment')}}>
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                   </svg>
