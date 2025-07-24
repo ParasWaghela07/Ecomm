@@ -136,7 +136,7 @@ const MyCart = () => {
 
   if (!cart || cart.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Navbar />
         <div className="container mx-auto px-4 py-20">
           <div className="max-w-md mx-auto bg-white rounded-xl shadow-md p-8 text-center border border-gray-200">

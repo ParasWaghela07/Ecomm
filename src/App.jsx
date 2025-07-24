@@ -10,6 +10,9 @@ import Products from "./pages/Products";
 import PaymentPage from "./pages/PaymentPage";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import OrderHistory from "./pages/OrderHistory";
+import ProductPage from "./pages/ProductPage";
+import OrderDetail from "./pages/OrderDetail";
+import ProfileSettings from "./pages/ProfileSettings";
 
 function App() {
   const {loading}=useContext(FirebaseContext);
@@ -24,6 +27,9 @@ function App() {
         <Route path='/payment' element={<PaymentPage/>}/>
         <Route path="/confirmation" element={<OrderConfirmation/>} />
         <Route path="/order-history" element={<OrderHistory/>} />
+        <Route path="/single-products/:productId" element={<ProductPage/>} />
+        <Route path="/order-detail/:orderId" element={<OrderDetail/>} />
+        <Route path='/profile/settings' element={<ProfileSettings/>}/>
       </Routes>
 
       {loading && (

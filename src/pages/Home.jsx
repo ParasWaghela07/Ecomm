@@ -227,28 +227,6 @@ const Home = () => {
             <p className="text-gray-600 max-w-2xl mx-auto">Discover our latest collection of premium footwear</p>
           </div>
 
-          {/* Filter/Sort Controls */}
-          <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-            <div className="w-full md:w-auto">
-              <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent">
-                <option>All Categories</option>
-                <option>Running</option>
-                <option>Sneakers</option>
-                <option>Basketball</option>
-                <option>Casual</option>
-                <option>Hiking</option>
-              </select>
-            </div>
-            <div className="w-full md:w-auto">
-              <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent">
-                <option>Sort By: Featured</option>
-                <option>Price: Low to High</option>
-                <option>Price: High to Low</option>
-                <option>Newest Arrivals</option>
-                <option>Best Sellers</option>
-              </select>
-            </div>
-          </div>
 
           <ShowProducts visibleProducts={visibleProducts} />
 

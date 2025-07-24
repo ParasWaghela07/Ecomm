@@ -215,3 +215,29 @@ exports.getAllCategories = async (req, res) => {
         });
     }
 }
+
+exports.getProductDetail=async(req,res)=>{
+    try{
+        const { productId } = req.params;
+
+        const product = await Product.findById(productId).populate('reviews.userId');
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            product: product
+        });
+    }
+    catch(e){
+        console.error(e);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error while fetching product details"
+        });
+    }
+}

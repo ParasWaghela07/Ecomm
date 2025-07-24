@@ -11,7 +11,7 @@ import { BsCashCoin } from 'react-icons/bs';
 import { toast } from 'react-hot-toast';
 
 const PaymentPage = () => {
-  const { user, cart } = useContext(FirebaseContext);
+  const { user, cart,setcart } = useContext(FirebaseContext);
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedPayment, setSelectedPayment] = useState('');
@@ -101,6 +101,7 @@ const PaymentPage = () => {
       const data = await response.json();
       if (data.success) {
         navigate('/confirmation');
+        setcart([]);
       }
     } catch (error) {
       console.error("Payment error:", error);

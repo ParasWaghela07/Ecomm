@@ -13,6 +13,10 @@ const ShowProducts = ({visibleProducts}) => {
 
     async function addtocart(item) {
     try {
+        if(!user) {
+            toast.error("Please login to add items to cart.");
+            return;
+        }
         const token = await user.getIdToken();
 
         const [response] = await toast.promise(
@@ -26,7 +30,7 @@ const ShowProducts = ({visibleProducts}) => {
             body: JSON.stringify({
                 productId: item._id,
                 quantity: 1,
-                size:"M"
+                size:"US 8"
             }),
             }),
             delay(1500) // ensures at least 1.5s delay
@@ -51,21 +55,22 @@ const ShowProducts = ({visibleProducts}) => {
     }
     }
   return (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 cursor-pointer">
             {visibleProducts?.length > 0 && 
               visibleProducts.map((product, index) => (
-                <div key={index} className="group relative bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
-                  <div className="relative h-80 overflow-hidden">
+                <div key={index} className="group relative bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300" >
+                  <div className="h-80 overflow-hidden">
                     <img loading='lazy'  
                       src={product.imageUrl} 
                       alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      onClick={() => window.location.href=`/single-products/${product._id}`}
                     />
                   </div>
                   <div className="p-6">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="text-lg font-semibold">{product.name.length > 15 ? (product.name.substr(0,15))+"..":(product.name)}</h3>
+                        <h3 className="text-lg font-semibold">{product.name.length > 12 ? (product.name.substr(0,12))+"..":(product.name)}</h3>
                         <p className="text-gray-600">{product.category}</p>
                       </div>
                       <div className="text-right">

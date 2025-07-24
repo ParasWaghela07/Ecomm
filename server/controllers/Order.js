@@ -35,21 +35,21 @@ exports.createOrder = async (req, res) => {
     }
 }
 
-exports.cancelOrder=async(req,res)=>{
-    try{
-        const {orderId} = req.body;
-        const userId = req.payload.id;
+exports.cancelOrder = async (req, res) => {
+    try {
+        const { orderId } = req.body;
+        const userId = req.payload.uid;
 
         if (!orderId) {
             return res.status(400).json({ message: 'Order ID is required' });
         }
 
-        const user = await User.findOne({firebaseUid:userId});
+        const user = await User.findOne({ firebaseUid: userId });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        const orderIndex = user.order.indexOf(orderId);
+        const orderIndex = user.order.findIndex(id => id.toString() === orderId.toString());
         if (orderIndex === -1) {
             return res.status(404).json({ message: 'Order not found' });
         }
@@ -57,16 +57,15 @@ exports.cancelOrder=async(req,res)=>{
         user.order.splice(orderIndex, 1);
         await user.save();
 
-        await Order.findByIdAndUpdate({orderId}, { status: 'Cancelled' });
+        // Fix: Pass orderId directly instead of an object
+        await Order.findByIdAndUpdate(orderId, { status: 'Cancelled' });
 
-        res.status(200).json({ success:true,message: 'Order cancelled successfully' });
-    }
-    catch(e){
+        res.status(200).json({ success: true, message: 'Order cancelled successfully' });
+    } catch (e) {
         console.error("Error cancelling order:", e);
-        res.status(500).json({ success:false,message: "Internal server error" });
+        res.status(500).json({ success: false, message: "Internal server error" });
     }
 }
-
 exports.getMyOrders=async(req,res)=>{
     try{
         const userId = req.payload.uid;
@@ -180,6 +179,28 @@ exports.saveAddress=async(req,res)=>{
     }
     catch(e){
         console.error("Error saving address:", e);
+        res.status(500).json({ success:false,message: "Internal server error" });
+    }
+}
+
+exports.getOrderById=async(req,res)=>{
+    try{
+        const { orderId } = req.params;
+
+        if (!orderId) {
+            return res.status(400).json({ success:false,message: 'Order ID is required' });
+        }
+
+        const order = await Order.findById(orderId).populate('userId', 'username email').populate('products.product');
+
+        if (!order) {
+            return res.status(404).json({ success:false,message: 'Order not found' });
+        }
+
+        res.status(200).json({ success:true,message: 'Order fetched successfully', order });
+    }
+    catch(e){
+        console.error("Error fetching order by ID:", e);
         res.status(500).json({ success:false,message: "Internal server error" });
     }
 }
