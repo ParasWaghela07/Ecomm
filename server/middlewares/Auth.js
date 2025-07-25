@@ -38,6 +38,7 @@ exports.isAdmin=async(req,res,next)=>{
         }
         try{
             const payload=jwt.verify(token,process.env.JWT_SECRET);
+        
             if(payload.role !== 'admin'){
                 return res.status(403).json({
                     success:false,

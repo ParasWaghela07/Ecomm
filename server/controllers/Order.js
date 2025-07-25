@@ -97,7 +97,7 @@ exports.getMyOrders=async(req,res)=>{
 
 exports.getAllOrders = async (req, res) => {
     try {
-        const orders = await Order.find().populate('userId', 'username email').populate('products.product', 'name price');
+        const orders = await Order.find().populate('userId', 'username email').populate('products.product');
 
         if (orders.length === 0) {
             return res.status(200).json({ success:true,message: 'No orders found', orders: [] });

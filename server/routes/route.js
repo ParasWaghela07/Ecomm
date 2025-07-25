@@ -27,16 +27,13 @@ router.get('/getCartItems', isUser,getCartItems);
 router.post('/createOrder', isUser, createOrder);
 router.post('/cancelOrder', isUser, cancelOrder);
 router.get('/getMyOrders', isUser, getMyOrders);
-router.get('/getAllOrders', isAdmin,getAllOrders);
-router.post('/approveOrder', isAdmin, approveOrder);
+router.get('/getAllOrders',isAdmin,getAllOrders);
+router.post('/approveOrder',isAdmin, approveOrder);
 router.get('/getOrderById/:orderId',isUser,getOrderById);
 
 router.get('/getAddress',isUser,getAddress);
 router.post('/saveAddress',isUser,saveAddress);
 
-router.get('/test', isUser,(req, res) => {
-    res.status(200).json({ message: 'Protected route accessed successfully' });
-});
 
 
 module.exports = router;

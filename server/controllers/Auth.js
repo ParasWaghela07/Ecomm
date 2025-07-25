@@ -252,7 +252,7 @@ exports.AdminLogin=async(req,res)=>{
             id:admin._id,
             name:admin.name,
             email:admin.email,
-            role:admin.role      }
+            role:'admin'      }
         const token=jwt.sign(payload,process.env.JWT_SECRET);
         const options={
             expires:new Date(Date.now()+3*24*60*60*1000),
