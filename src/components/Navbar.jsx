@@ -218,7 +218,7 @@ const Navbar = () => {
                   </button>
                   <button
                     onClick={() => {
-                      navigate('/profile');
+                      navigate('/profile/settings');
                       setIsMenuOpen(false);
                     }}
                     className="flex items-center text-gray-500 hover:text-gray-700"

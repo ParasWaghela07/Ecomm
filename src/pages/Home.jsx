@@ -192,7 +192,7 @@ const Home = () => {
                 <SwiperSlide key={index}>
                   <div className="group relative overflow-hidden rounded-lg bg-gray-100 h-64 mx-2">
                     <img
-                      src={category.imageUrl}
+                      src={`/${category.name}.png`}
                       alt={`${category.name} Shoes`}
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />

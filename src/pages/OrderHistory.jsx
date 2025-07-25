@@ -50,7 +50,7 @@ const OrderHistory = () => {
         return <FaCheckCircle className="text-green-500" />;
       case 'Cancelled':
         return <FaTimesCircle className="text-red-500" />;
-      case 'Shipped':
+      case 'Out for delivery':
         return <FaShippingFast className="text-blue-500" />;
       default:
         return <FaBoxOpen className="text-yellow-500" />;

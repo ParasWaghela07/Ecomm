@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom'
 
 const CategoryCard = ({ category }) => {
     const navigate=useNavigate();
+    console.log(category.name+'.png')
   return (
     <div className="group relative overflow-hidden rounded-lg bg-gray-100 h-64 cursor-pointer" onClick={()=>navigate('/products/'+category.name.toLowerCase())}>
       <img loading='lazy' 
-        src={category.imageUrl}
+        src={`/${category.name}.png`} 
         alt={category.name}
         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
       />
