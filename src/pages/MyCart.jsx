@@ -36,16 +36,15 @@ const MyCart = () => {
       ]),
       {
         loading: 'Adding...',
-        success: 'Item Added!',
-        error: 'Failed to add item',
       }
     );
 
     const data = await response.json();
 
     if (data.success) {
-      console.log(data.cart)
+      // console.log(data.cart)
       setcart(data.cart);
+      toast.success('Item added to cart!');
     } else {
       toast.error(data.message || "Add to cart failed.");
     }

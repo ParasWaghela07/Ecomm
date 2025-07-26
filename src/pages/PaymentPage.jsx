@@ -103,6 +103,7 @@ const PaymentPage = () => {
         navigate('/confirmation');
         setcart([]);
       }
+      else toast.error(data.message);
     } catch (error) {
       console.error("Payment error:", error);
     }

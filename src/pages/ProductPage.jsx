@@ -4,7 +4,7 @@ import { FirebaseContext } from '../context/FirebaseContext';
 import { useContext } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { FaStar, FaStarHalfAlt, FaRegStar, FaShoppingCart, FaRuler } from 'react-icons/fa';
+import { FaUser,FaCalendarAlt,FaStar, FaStarHalfAlt, FaRegStar, FaShoppingCart, FaRuler } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 import ShowProducts from '../components/ShowProducts';
 
@@ -24,7 +24,7 @@ const ProductPage = () => {
       try {
         const response = await fetch(`http://localhost:4000/getProductDetail/${productId}`);
         const data = await response.json();
-        
+        console.log(data.product.reviews)
         if (data.success) {
           setProduct(data.product);
         } else {
@@ -207,6 +207,52 @@ const ProductPage = () => {
               <span>Add to Cart</span>
             </button>
           </div>
+        </div>
+
+        <div className="mt-16">
+          <h2 className="text-2xl font-bold mb-6">Customer Reviews</h2>
+          
+          {product.reviews?.length > 0 ? (
+            <div className="space-y-6">
+              {product.reviews.map((review, index) => (
+                <div key={index} className="bg-white p-6 rounded-lg shadow">
+                  <div className="flex items-center mb-3">
+                    <div className="bg-gray-200 rounded-full p-2 mr-3">
+                      <FaUser className="text-gray-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium"> {review.userId.username || review.userId.email.substr(0,5)}</p>
+                      <div className="flex items-center text-sm text-gray-500">
+                        <FaCalendarAlt className="mr-1" />
+                        <span>
+                          {new Date(review.date).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex mb-3">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <FaStar 
+                        key={star}
+                        className={`w-5 h-5 ${
+                          review.rating >= star ? 'text-yellow-400' : 'text-gray-300'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <p className="text-gray-700">{review.comment}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white p-6 rounded-lg shadow text-center">
+              <p className="text-gray-500">No reviews yet for this product</p>
+            </div>
+          )}
         </div>
         
         {/* Related Products Section */}

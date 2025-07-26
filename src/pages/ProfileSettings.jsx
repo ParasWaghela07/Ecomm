@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 const ProfileSettings = () => {
-  const { user, updateUserProfile } = useContext(FirebaseContext);
+  const { user } = useContext(FirebaseContext);
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
@@ -18,13 +18,35 @@ const ProfileSettings = () => {
 
   // Load user data
   useEffect(() => {
+    const fetchUserData = async () =>{
+      const token = await user.getIdToken();
+      try {
+        const response = await fetch('http://localhost:4000/fetchUserData', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          }
+        });
+        const data = await response.json();
+        console.log(data);
+        if (data.success) {
+          setFormData({
+            username: data.user.username || '',
+            phone: data.user.phone || '',
+            address: data.user.address || ''
+          });
+        } else {
+          toast.error(data.message || 'Failed to load user data');
+        }
+      } catch (error) {
+        toast.error(`Error fetching user data: ${error.message}`);
+      } finally {
+        setIsLoading(false);
+      }
+    }
     if (user) {
-      setFormData({
-        username: user.displayName || '',
-        phone: user.phoneNumber || '',
-        address: user.address || ''
-      });
-      setIsLoading(false);
+      fetchUserData();
     }
   }, [user]);
 
@@ -41,10 +63,14 @@ const ProfileSettings = () => {
     setIsUpdating(true);
     
     try {
-      await updateUserProfile({
-        displayName: formData.username,
-        phoneNumber: formData.phone,
-        address: formData.address
+      const token = await user.getIdToken();
+      const response = await fetch('http://localhost:4000/saveUserDetails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(formData)
       });
       toast.success('Profile updated successfully!');
     } catch (error) {

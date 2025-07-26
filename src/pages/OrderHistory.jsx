@@ -4,12 +4,15 @@ import { FirebaseContext } from '../context/FirebaseContext';
 import { useContext } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { FaBoxOpen, FaShippingFast, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import { FaBoxOpen, FaShippingFast, FaCheckCircle, FaTimesCircle, FaStar } from 'react-icons/fa';
+import { toast } from 'react-hot-toast';
 
 const OrderHistory = () => {
   const { user } = useContext(FirebaseContext);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [reviewData, setReviewData] = useState({});
+  const [activeReviewForm, setActiveReviewForm] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,7 +27,6 @@ const OrderHistory = () => {
         
         const data = await response.json();
         if (data.success) {
-          // Sort orders: Preparing first, then by date (newest first)
           const sortedOrders = data.orders.sort((a, b) => {
             if (a.status === 'Preparing' && b.status !== 'Preparing') return -1;
             if (a.status !== 'Preparing' && b.status === 'Preparing') return 1;
@@ -44,16 +46,68 @@ const OrderHistory = () => {
     }
   }, [user]);
 
+  const handleReviewChange = (orderId, field, value) => {
+    setReviewData(prev => ({
+      ...prev,
+      [orderId]: {
+        ...prev[orderId],
+        [field]: value
+      }
+    }));
+  };
+
+  const submitReview = async (orderId, productId) => {
+    try {
+      const token = await user.getIdToken();
+      console.log(reviewData)
+      const response = await fetch('http://localhost:4000/AddReview', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          orderId,
+          rating: reviewData[orderId]?.rating,
+          comment: reviewData[orderId]?.comment
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        toast.success('Review submitted successfully!');
+        setActiveReviewForm(null);
+        // Update local state to reflect the review
+        setOrders(prevOrders => prevOrders.map(order => {
+          if (order._id === orderId) {
+            const updatedProducts = order.products.map(product => {
+              if (product.product._id === productId) {
+                return {
+                  ...product,
+                  reviewed: true
+                };
+              }
+              return product;
+            });
+            return { ...order, products: updatedProducts };
+          }
+          return order;
+        }));
+      } else {
+        toast.error(data.message || 'Failed to submit review');
+      }
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      toast.error('Failed to submit review');
+    }
+  };
+
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'Delivered':
-        return <FaCheckCircle className="text-green-500" />;
-      case 'Cancelled':
-        return <FaTimesCircle className="text-red-500" />;
-      case 'Out for delivery':
-        return <FaShippingFast className="text-blue-500" />;
-      default:
-        return <FaBoxOpen className="text-yellow-500" />;
+      case 'Delivered': return <FaCheckCircle className="text-green-500" />;
+      case 'Cancelled': return <FaTimesCircle className="text-red-500" />;
+      case 'Out for delivery': return <FaShippingFast className="text-blue-500" />;
+      default: return <FaBoxOpen className="text-yellow-500" />;
     }
   };
 
@@ -93,40 +147,20 @@ const OrderHistory = () => {
           </div>
         ) : (
           <div className="space-y-8">
-            {/* Preparing Orders */}
-            {orders.filter(order => order.status === 'Preparing').length > 0 && (
-              <div>
-                <div className="space-y-6">
-                  {orders.filter(order => order.status === 'Preparing').map((order) => (
-                    <OrderCard 
-                      key={order._id} 
-                      order={order} 
-                      navigate={navigate}
-                      formatDate={formatDate}
-                      getStatusIcon={getStatusIcon}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Completed/Delivered Orders */}
-            {orders.filter(order => order.status !== 'Preparing').length > 0 && (
-              <div>
-                <h2 className="text-xl font-semibold mb-4">Order History</h2>
-                <div className="space-y-6">
-                  {orders.filter(order => order.status !== 'Preparing').map((order) => (
-                    <OrderCard 
-                      key={order._id} 
-                      order={order} 
-                      navigate={navigate}
-                      formatDate={formatDate}
-                      getStatusIcon={getStatusIcon}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
+            {orders.map((order) => (
+              <OrderCard 
+                key={order._id} 
+                order={order} 
+                navigate={navigate}
+                formatDate={formatDate}
+                getStatusIcon={getStatusIcon}
+                reviewData={reviewData}
+                handleReviewChange={handleReviewChange}
+                submitReview={submitReview}
+                activeReviewForm={activeReviewForm}
+                setActiveReviewForm={setActiveReviewForm}
+              />
+            ))}
           </div>
         )}
       </main>
@@ -136,8 +170,17 @@ const OrderHistory = () => {
   );
 };
 
-// Separate component for order card
-const OrderCard = ({ order, navigate, formatDate, getStatusIcon }) => {
+const OrderCard = ({ 
+  order, 
+  navigate, 
+  formatDate, 
+  getStatusIcon,
+  reviewData,
+  handleReviewChange,
+  submitReview,
+  activeReviewForm,
+  setActiveReviewForm
+}) => {
   const remainingProducts = order.products.length - 1;
   
   return (
@@ -163,43 +206,106 @@ const OrderCard = ({ order, navigate, formatDate, getStatusIcon }) => {
       
       <div className="px-4 py-5 sm:p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Order Items - Show only first product */}
           <div>
             <h4 className="text-lg font-medium mb-4">Items</h4>
             <div className="space-y-4">
               {order.products.slice(0, 3).map((item, index) => (
-                <div key={index} className="flex">
-                  <div className="flex-shrink-0 h-20 w-20 rounded-md overflow-hidden">
-                    <img
-                      src={item.product.imageUrl}
-                      alt={item.product.name}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <div className="ml-4 flex-1">
-                    <div className="flex justify-between text-base font-medium text-gray-900">
-                      <h3>{item.product.name}</h3>
-                      <p>₹{item.product.price}</p>
+                <div key={index} className="flex flex-col">
+                  <div className="flex">
+                    <div className="flex-shrink-0 h-20 w-20 rounded-md overflow-hidden">
+                      <img
+                        src={item.product.imageUrl}
+                        alt={item.product.name}
+                        className="h-full w-full object-cover"
+                      />
                     </div>
-                    <p className="mt-1 text-sm text-gray-500">
-                      Size: {item.size || 'One Size'}
-                    </p>
-                    <p className="mt-1 text-sm text-gray-500">
-                      Qty: {item.quantity}
-                    </p>
-                    {remainingProducts > 0 && (
+                    <div className="ml-4 flex-1">
+                      <div className="flex justify-between text-base font-medium text-gray-900">
+                        <h3>{item.product.name}</h3>
+                        <p>₹{item.product.price}</p>
+                      </div>
                       <p className="mt-1 text-sm text-gray-500">
-                        and {remainingProducts} more product{remainingProducts > 1 ? 's' : ''}
+                        Size: {item.size || 'One Size'}
                       </p>
-                    )}
+                      <p className="mt-1 text-sm text-gray-500">
+                        Qty: {item.quantity}
+                      </p>
+                    </div>
                   </div>
+                  
+                  {/* Review Section for Delivered Orders */}
+                  {order.status === 'Delivered' && !item.reviewed && (
+                    <div className="mt-3 pl-24">
+                      {activeReviewForm === `${order._id}-${item.product._id}` ? (
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          <div className="flex mb-3">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <button
+                                key={star}
+                                type="button"
+                                onClick={() => handleReviewChange(
+                                  order._id, 
+                                  'rating', 
+                                  star
+                                )}
+                                className="mr-1"
+                              >
+                                <FaStar 
+                                  className={`h-5 w-5 ${reviewData[order._id]?.rating >= star ? 'text-yellow-400' : 'text-gray-300'}`} 
+                                />
+                              </button>
+                            ))}
+                          </div>
+                          <textarea
+                            placeholder="Your review..."
+                            className="w-full p-2 border rounded"
+                            value={reviewData[order._id]?.comment || ''}
+                            onChange={(e) => handleReviewChange(
+                              order._id, 
+                              'comment', 
+                              e.target.value
+                            )}
+                          />
+                          <div className="flex justify-end space-x-2 mt-2">
+                            <button
+                              onClick={() => setActiveReviewForm(null)}
+                              className="px-3 py-1 text-sm text-gray-600"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={() => submitReview(order._id, item.product._id)}
+                              disabled={!reviewData[order._id]?.rating}
+                              className={`px-3 py-1 text-sm rounded ${reviewData[order._id]?.rating ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'}`}
+                            >
+                              Submit
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setActiveReviewForm(`${order._id}-${item.product._id}`)}
+                          className="text-sm text-blue-600 hover:text-blue-800"
+                        >
+                          Write a Review
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
+              {remainingProducts > 0 && (
+                <p className="mt-1 text-sm text-gray-500">
+                  and {remainingProducts} more product{remainingProducts > 1 ? 's' : ''}
+                </p>
+              )}
             </div>
           </div>
           
-          {/* Order Summary */}
           <div>
+            <h4 className="text-lg font-medium mb-4">Order Summary</h4>
+            <div className="bg-gray-50 p-4 rounded-lg">
+                       <div>
             <h4 className="text-lg font-medium mb-4">Order Summary</h4>
             <div className="bg-gray-50 p-4 rounded-lg">
               <div className="space-y-3">
@@ -232,6 +338,8 @@ const OrderCard = ({ order, navigate, formatDate, getStatusIcon }) => {
                   {formatDate(order.status === 'Delivered' ? order.deliveredDate || order.expectedDeliveryDate : order.expectedDeliveryDate)}
                 </p>
               </div>
+            </div>
+          </div>
             </div>
           </div>
         </div>

@@ -40,13 +40,13 @@ const Navbar = () => {
             {/* Desktop navigation */}
             <div className="hidden md:ml-6 md:flex md:space-x-8">
               <a
-                href="#"
+                href="/products/all"
                 className="border-transparent text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
               >
                 Shop Now
               </a>
               <a
-                href="#"
+                href="/about"
                 className="border-transparent text-gray-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
               >
                 About Us
@@ -169,13 +169,13 @@ const Navbar = () => {
         <div className="md:hidden">
           <div className="pt-2 pb-3 space-y-1">
             <a
-              href="#"
+              href="/products/all"
               className="bg-gray-50 border-transparent text-gray-500 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
             >
               Shop Now
             </a>
             <a
-              href="#"
+              href="/about"
               className="bg-gray-50 border-transparent text-gray-500 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
             >
               About Us

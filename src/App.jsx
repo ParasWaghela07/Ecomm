@@ -15,6 +15,7 @@ import OrderDetail from "./pages/OrderDetail";
 import ProfileSettings from "./pages/ProfileSettings";
 import AdminLanding from "./pages/AdminLanding";
 import AdminLogin from "./pages/AdminLogin";
+import About from "./pages/About";
 
 function App() {
   const {loading}=useContext(FirebaseContext);
@@ -34,6 +35,8 @@ function App() {
         <Route path='/profile/settings' element={<ProfileSettings/>}/>
         <Route path='/admin' element={<AdminLanding/>}/>
         <Route path='/adminlogin' element={<AdminLogin/>}/>
+        <Route path='/about' element={<About/>}/>
+        <Route path='*' element={<h1>Page Not Found</h1>}/>
       </Routes>
 
       {loading && (

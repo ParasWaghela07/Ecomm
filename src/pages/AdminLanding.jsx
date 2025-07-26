@@ -23,8 +23,19 @@ const AdminLanding = () => {
         credentials: 'include' // Include cookies for session management
       });
         const data = await response.json();
-        setOrders(data.orders);
+        if(data.success !== true) navigate('/');
+        const sortedOrders = data.orders.sort((a, b) => {
+      const statusPriority = {
+        'Preparing': 1,
+        'Out for delivery': 2,
+        'Delivered': 3
+      };
+      return statusPriority[a.status] - statusPriority[b.status];
+    });
+
+    setOrders(sortedOrders);
       } catch (error) {
+        
         toast.error('Failed to load orders');
       } finally {
         setLoading(false);
@@ -62,19 +73,20 @@ const AdminLanding = () => {
     }
   }, [orders, timeRange]);
 
-  const updateOrderStatus = async (orderId) => {
+  const updateOrderStatus = async (orderId,status) => {
     try {
       const response = await fetch(`http://localhost:4000/approveOrder`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ orderId }),
+        body: JSON.stringify({ orderId,status }),
+        credentials: 'include' // Include cookies for session management
       });
 
       if (response.ok) {
         setOrders(orders.map(order => 
-          order._id === orderId ? { ...order, status: "Out for delivery" } : order
+          order._id === orderId ? { ...order, status: status} : order
         ));
       }
     } catch (error) {

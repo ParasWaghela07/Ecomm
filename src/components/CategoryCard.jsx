@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 
 const CategoryCard = ({ category }) => {
     const navigate=useNavigate();
-    console.log(category.name+'.png')
+    
   return (
     <div className="group relative overflow-hidden rounded-lg bg-gray-100 h-64 cursor-pointer" onClick={()=>navigate('/products/'+category.name.toLowerCase())}>
       <img loading='lazy' 

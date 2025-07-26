@@ -1,6 +1,6 @@
 const User=require('../models/User');
 const Order = require('../models/Order');
-
+const Product = require('../models/Product');
 exports.createOrder = async (req, res) => {
     try{
         const {address}= req.body;
@@ -10,6 +10,10 @@ exports.createOrder = async (req, res) => {
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
+        }
+
+        if(!user.phone){
+            return res.status(400).json({ message: 'Please set a phone number in Account settings' });
         }
 
         if (user.cart.length === 0) {
@@ -112,7 +116,7 @@ exports.getAllOrders = async (req, res) => {
 
 exports.approveOrder = async (req, res) => {
     try {
-        const { orderId } = req.body;
+        const { orderId ,status} = req.body;
 
         if (!orderId) {
             return res.status(400).json({ success:false,message: 'Order ID is required' });
@@ -123,14 +127,22 @@ exports.approveOrder = async (req, res) => {
             return res.status(404).json({ success:false,message: 'Order not found' });
         }
 
-        order.status = 'Out for delivery';
+        order.status = status;
         await order.save();
 
-        setTimeout(async () => {
-            order.status = 'Delivered';
-            await order.save();
-        }, 30*60 * 1000);
-
+        if (status === 'Delivered') {
+        for (const item of order.products) {
+            await Product.findByIdAndUpdate(
+            item.product, 
+            {
+                $inc: {
+                unitSold: item.quantity, 
+                quantity: -item.quantity 
+                }
+            }
+            );
+        }
+        }
         res.status(200).json({ success:true,message: 'Order approved successfully', order });
     } catch (e) {
         console.error("Error approving order:", e);
@@ -202,5 +214,53 @@ exports.getOrderById=async(req,res)=>{
     catch(e){
         console.error("Error fetching order by ID:", e);
         res.status(500).json({ success:false,message: "Internal server error" });
+    }
+}
+
+exports.saveUserDetails = async (req, res) => {
+    try {
+        const { username, phone,address } = req.body;
+        const userId = req.payload.uid;
+
+        if (!username && !phone && !address) {
+            return res.status(400).json({ success: false, message: 'Fill atleast one field' });
+        }
+
+        const user = await User.findOneAndUpdate(
+            { firebaseUid: userId },
+            { username, phone, address },
+            { new: true }
+        );
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        res.status(200).json({ success: true, message: 'User details updated successfully', user });
+    } catch (e) {
+        console.error("Error saving user details:", e);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+}
+
+exports.fetchUserData = async (req, res) => {
+    try{
+        const userId = req.payload.uid;
+
+        const user = await User.findOne({ firebaseUid: userId });
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        res.status(200).json({
+            success: true,
+            user
+        });
+    }
+    catch(e){
+        console.error("Error fetching user data:", e);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error while fetching user data",
+        });
     }
 }

@@ -11,7 +11,7 @@ exports.addToCart = async (req, res) => {
         }
 
         // First find the user without populating
-        let user = await User.findOne({ firebaseUid: req.payload.uid });
+        let user = await User.findOne({ firebaseUid: req.payload.uid }).populate('cart.product');
         
         if (!user) {
             return res.status(404).json({
@@ -21,10 +21,15 @@ exports.addToCart = async (req, res) => {
         }
 
         const existingProductIndex = user.cart.findIndex(
-            item => item.product.toString() === productId && item.size === size
+            item => item.product._id.toString() === productId && item.size === size
         );
-
         if (existingProductIndex > -1) {
+            if(user.cart[existingProductIndex].product.quantity <= user.cart[existingProductIndex].quantity){ 
+                return res.status(400).json({
+                    success: false,
+                    message: "We don't have enough stock for this product",
+                });
+            }
             user.cart[existingProductIndex].quantity += quantity;
         } else {
             user.cart.push({ product: productId, quantity: quantity, size: size });
