@@ -48,69 +48,18 @@ const Home = () => {
           spaceBetween={50}
           allowTouchMove={false}
         >
-          <SwiperSlide>
-            <div className="flex flex-col md:flex-row h-[80vh] ">
-              <div className="w-full md:w-1/2 bg-[#1A2433] flex items-center justify-center p-12">
-                <div className="text-white">
-                  <span className="text-sm uppercase tracking-widest text-gray-400">
-                    New Collection
-                  </span>
-                  <h1 className="text-4xl md:text-6xl font-bold my-4">
-                    AIR MAX PREMIUM
-                  </h1>
-                  <p className="text-lg mb-8">
-                    Experience unmatched comfort with our latest technology
-                  </p>
-                  <button className="bg-white text-black px-8 py-3 font-medium hover:bg-gray-200 transition">
-                    Explore Now
-                  </button>
-                </div>
-              </div>
-              <div className="w-full md:w-1/2 bg-gray-100 flex items-center justify-center">
-                <img
-                  src="/shoebg.png"
-                  alt="Premium Shoe"
-                  className="max-h-[80%] object-contain"
-                />
-              </div>
-            </div>
-          </SwiperSlide>
+
 
           <SwiperSlide>
-            <div className="relative h-[80vh] bg-gradient-to-br from-gray-100 to-gray-300">
-              <div className="absolute inset-0 flex items-center">
-                <div className="container mx-auto px-6 z-10">
-                  <h1 className="text-5xl md:text-7xl font-bold mb-4">
-                    Step Into Style
-                  </h1>
-                  <p className="text-xl md:text-2xl mb-8 max-w-lg">
-                    Discover our latest collection of premium footwear
-                  </p>
-                  <button className="bg-black text-white px-8 py-3 text-lg font-medium hover:bg-gray-800 transition">
-                    Shop New Arrivals
-                  </button>
-                </div>
-              </div>
-              <div className="absolute right-0 bottom-0 w-1/2 h-full bg-[#1A2433]">
-                <img
-                  src="/shoebg.png"
-                  alt="Featured Shoe"
-                  className="h-full w-full object-contain object-right-bottom"
-                />
-              </div>
-            </div>
-          </SwiperSlide>
-
-          <SwiperSlide>
-            <div className="relative bg-black overflow-hidden h-[80vh]">
+            <div className="relative bg-gray-200 overflow-hidden h-[80vh]">
               <img
-                src="/shoebg.png"
+                src="/hero3.png"
                 alt="Shoe Collection"
                 className="absolute inset-0 w-full h-full object-cover opacity-70"
               />
               <div className="relative z-10 flex items-center h-full">
-                <div className="container mx-auto px-6 text-white">
-                  <span className="text-sm uppercase tracking-widest text-gray-300">
+                <div className="container mx-auto px-6 text-[#1A2433]">
+                  <span className="text-sm uppercase tracking-widest">
                     Limited Edition
                   </span>
                   <h1 className="text-5xl md:text-7xl font-bold my-4">
@@ -120,44 +69,63 @@ const Home = () => {
                     Performance meets style in our newest running collection
                   </p>
                   <div className="flex gap-4">
-                    <button className="bg-white text-black px-8 py-3 font-medium hover:bg-gray-200 transition">
-                      Shop Men
-                    </button>
-                    <button className="border-2 border-white text-white px-8 py-3 font-medium hover:bg-white hover:text-black transition">
-                      Shop Women
+                    <button className="bg-gray-500 text-white px-8 py-3 font-medium hover:bg-gray-600 transition rounded-md">
+                      Get the Look
                     </button>
                   </div>
                 </div>
               </div>
             </div>
           </SwiperSlide>
-
+          
           <SwiperSlide>
-            <div className="relative bg-gradient-to-br from-gray-100 to-gray-300 h-[80vh] overflow-hidden px-10">
-              <div className="absolute inset-0 opacity-10 bg-[url('/shoebg.png')] bg-repeat"></div>
+            <div className="relative bg-gray-900 h-[80vh] overflow-hidden flex items-center px-10">
+              
+              <img
+                src="/hero4.png"
+                alt="New Arrivals"
+                className="absolute right-0 top-0 w-1/2 h-full object-cover z-0"
+              />
 
-              <div className="container mx-auto h-full flex items-center">
-                <div className="relative z-10 max-w-md">
-                  <h1 className="text-5xl font-bold mb-4">ELEVATE YOUR GAME</h1>
-                  <p className="text-lg mb-8">
-                    Professional-grade footwear for athletes who demand
-                    perfection
-                  </p>
-                  <button className="bg-black text-white px-8 py-3 rounded-full font-medium hover:bg-gray-800 transition">
-                    View Collection
-                  </button>
-                </div>
-              </div>
-
-              <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1/2">
-                <img
-                  src="/shoebg.png"
-                  alt="Athletic Shoe"
-                  className="w-full max-w-xl float-right animate-float"
-                />
+              <div className="relative z-10 max-w-lg">
+                <h1 className="text-6xl font-extrabold mb-5 text-white drop-shadow-lg">
+                  FRESH DROPS
+                </h1>
+                <p className="text-xl mb-8 text-indigo-100 opacity-90">
+                  Just in: Sleek silhouettes and next-gen comfort for everyday icons. Gear up for the latest wave.
+                </p>
+                <button className="bg-white text-gray-900 px-10 py-3 rounded font-bold hover:bg-indigo-100 transition">
+                  Explore Now
+                </button>
               </div>
             </div>
           </SwiperSlide>
+
+          <SwiperSlide>
+            <div className="relative h-[80vh] overflow-hidden flex items-center px-10">
+              <div className="absolute left-0 top-0 w-full h-full">
+                        <img
+                          src="/per.png"
+                          alt="Shoe Collection"
+                          className="absolute inset-0 w-full h-full object-cover opacity-95"
+                        />
+              </div>
+              <div className="container mx-auto z-10">
+                <div className="max-w-lg ml-auto text-right text-white">
+                  <h1 className="text-6xl font-extrabold mb-5 tracking-tighter drop-shadow-lg">
+                    URBAN EDGE
+                  </h1>
+                  <p className="text-xl mb-8 opacity-90">
+                    Step bold with our cutting-edge street sneakers, built for style and comfort in the city.
+                  </p>
+                  <button className="bg-white text-black px-10 py-3 rounded font-bold hover:bg-gray-200 transition">
+                    See the Drop
+                  </button>
+                </div>
+              </div>
+            </div>
+          </SwiperSlide>
+
         </Swiper>
 
         {/* Categories Section */}
@@ -221,7 +189,7 @@ const Home = () => {
         </section>
 
         {/* Products Section */}
-        <section className="my-16 px-4 sm:px-6 lg:px-8">
+        <section className="mt-16 px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Our Featured Products</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">Discover our latest collection of premium footwear</p>

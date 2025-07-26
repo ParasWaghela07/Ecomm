@@ -6,7 +6,9 @@ html, body, #root {
   height: 100%;
   width: 100%;
 }
-
+.clip-path-diagonal {
+  clip-path: polygon(0 0, 100% 0, 100% 60%, 0 100%);
+}
 
 .poppins-medium {
   font-family: 'Poppins', sans-serif;

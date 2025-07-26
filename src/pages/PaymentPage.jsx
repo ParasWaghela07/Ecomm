@@ -103,7 +103,7 @@ const PaymentPage = () => {
         navigate('/confirmation');
         setcart([]);
       }
-      else toast.error(data.message);
+      else toast.error(data.message),toast.dismiss(toastid);
     } catch (error) {
       console.error("Payment error:", error);
     }
@@ -306,7 +306,7 @@ const PaymentPage = () => {
             <div className="space-y-4">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span>₹{cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0).toFixed(2)}</span>
+                <span>${cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0).toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Shipping</span>
@@ -314,11 +314,11 @@ const PaymentPage = () => {
               </div>
               <div className="flex justify-between">
                 <span>Tax</span>
-                <span>₹{(cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0) * 0.18).toFixed(2)}</span>
+                <span>${(cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0) * 0.18).toFixed(2)}</span>
               </div>
               <div className="border-t border-gray-200 pt-4 flex justify-between font-bold text-lg">
                 <span>Total</span>
-                <span>₹{(cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0) * 1.18).toFixed(2)}</span>
+                <span>${(cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0) * 1.18).toFixed(2)}</span>
               </div>
               
               <button

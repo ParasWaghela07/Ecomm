@@ -6,6 +6,7 @@ import { FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
 import { toast } from "react-hot-toast";
 import { useParams } from 'react-router-dom';
 import ShowProducts from '../components/ShowProducts';
+import Footer from '../components/Footer';
 const Products = () => {
     const {category} = useParams();
     const { products, user, setcart } = useContext(FirebaseContext);
@@ -42,6 +43,7 @@ const Products = () => {
                     <ShowProducts visibleProducts={visibleProducts}/>
                 </section>
             </main>
+                  <Footer/>
         </div>
     )
 }

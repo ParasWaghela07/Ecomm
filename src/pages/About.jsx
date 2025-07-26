@@ -1,6 +1,7 @@
 import { FaLeaf, FaHandsHelping, FaLightbulb } from 'react-icons/fa';
 import { FiAward, FiUsers, FiShoppingBag } from 'react-icons/fi';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 const About = () => {
   const teamMembers = [
     {
@@ -181,7 +182,7 @@ const About = () => {
           <div className="mt-8 flex lg:mt-0 lg:flex-shrink-0">
             <div className="inline-flex rounded-md shadow">
               <a
-                href="/products"
+                href="/products/all"
                 className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-[#1A2433] hover:bg-blue-700"
               >
                 Browse Products
@@ -190,6 +191,7 @@ const About = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

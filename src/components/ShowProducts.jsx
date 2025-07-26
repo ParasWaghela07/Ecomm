@@ -115,7 +115,7 @@ const ShowProducts = ({ visibleProducts }) => {
                                                 </span>
                                             );
                                         })}
-                                        <span className="text-xs text-gray-500 ml-1">({product.reviewCount || 0})</span>
+                                        <span className="text-xs text-gray-500 ml-1">({product.reviews.length || 0})</span>
                                     </div>
                                 </div>
                             </div>

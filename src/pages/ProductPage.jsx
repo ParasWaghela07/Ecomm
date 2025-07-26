@@ -142,7 +142,7 @@ const ProductPage = () => {
               </span>
             </div>
             
-            <p className="text-2xl font-bold">₹{product.price}</p>
+            <p className="text-2xl font-bold">${product.price}</p>
             
             {product.offer && (
               <p className="text-green-600 font-medium">{product.offer}</p>
