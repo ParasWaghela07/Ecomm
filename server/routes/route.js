@@ -12,7 +12,6 @@ router.post('/register', register);
 router.post('/login', login);
 router.post('/AdminLogin', AdminLogin);
 
-
 router.post('/addProduct', isAdmin,addProduct);
 router.post('/editProduct',isAdmin, editProduct); 
 router.post('/deleteProduct', isAdmin, deleteProduct);
