@@ -103,7 +103,7 @@ export default function FirebaseContextProvider({ children }) {
       setcart(data.cart);
     } else {
       console.error("Failed to fetch cart data:", data.message);
-      toast.error("Failed to fetch cart data.");
+      // toast.error("Failed to fetch cart data.");
     }
   } catch (e) {
     console.error("Error fetching cart data:", e);

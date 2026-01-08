@@ -1,43 +1,143 @@
 const User=require('../models/User');
 const Order = require('../models/Order');
 const Product = require('../models/Product');
+const crypto=require('crypto');
+
+const Razorpay = require("razorpay");
+
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
+
 exports.createOrder = async (req, res) => {
-    try{
-        const {address}= req.body;
-        const userid=req.payload.uid;
+  try {
+    const { address, isCOD } = req.body;
+    const userid = req.payload.uid;
 
-        const user=await User.findOne({firebaseUid:userid}).populate('cart.product');
+    const user = await User.findOne({ firebaseUid: userid }).populate("cart.product");
 
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-        if(!user.phone){
-            return res.status(400).json({ message: 'Please set a phone number in Account settings' });
-        }
+    if (!user.phone) {
+      return res
+        .status(400)
+        .json({ message: "Please set a phone number in Account settings" });
+    }
 
-        if (user.cart.length === 0) {
-            return res.status(400).json({ message: 'Cart is empty' });
-        }
+    if (user.cart.length === 0) {
+      return res.status(400).json({ message: "Cart is empty" });
+    }
 
+    const totalAmount = user.cart.reduce(
+      (total, item) => total + item.product.price * item.quantity,
+      0
+    );
+
+    // 🔴 Create Razorpay order ONLY when isCOD = false
+    let razorpayOrder = null;
+
+    if (isCOD === false) {
+      razorpayOrder = await razorpay.orders.create({
+        amount: totalAmount * 100, // paise
+        currency: "INR",
+        receipt: `rcpt_${Date.now()}`,
+      });
+    }
+
+    // ✅ Create DB order
         const order=await Order.create({
             userId: user._id,
             products: user.cart,
             totalAmount: user.cart.reduce((total, item) => total + item.product.price * item.quantity, 0),
             shippingAddress: address || user.address,
+            razorpayOrderId: razorpayOrder ? razorpayOrder.id : null,
         })
 
-        user.order.push(order._id);
-        user.cart = [];
-        await user.save();
 
-        res.status(201).json({ success:true,message: 'Order created successfully', order });
+    user.order.push(order._id);
+    user.cart = [];
+    await user.save();
+
+    // ✅ Send Razorpay order id if exists
+    res.status(201).json({
+      success: true,
+      message: "Order created successfully",
+      order
+    });
+  } catch (e) {
+    console.error("Error creating order:", e);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+exports.verifyPayment = async (req, res) => {
+  try {
+    const {
+      razorpay_payment_id,
+      razorpay_order_id,
+      razorpay_signature,
+      orderId,
+    } = req.body;
+
+    if (
+      !razorpay_payment_id ||
+      !razorpay_order_id ||
+      !razorpay_signature ||
+      !orderId
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing payment verification fields",
+      });
     }
-    catch(e){
-        console.error("Error creating order:", e);
-        res.status(500).json({ success:false,message: "Internal server error" });
+
+    console.log("AAgya");
+    const generatedSignature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+      .digest("hex");
+
+    if (generatedSignature !== razorpay_signature) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid payment signature",
+      });
     }
-}
+
+    const order = await Order.findByIdAndUpdate(
+      orderId,
+      {
+        paymentStatus: true, // ✅ ONLY CHANGE
+      },
+      { new: true }
+    );
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Payment verified successfully",
+      order,
+    });
+  } catch (error) {
+    console.error("Payment verification error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
 
 exports.cancelOrder = async (req, res) => {
     try {
